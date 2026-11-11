@@ -1,0 +1,25 @@
+name: DNA-Exposure-Monitor
+
+services:
+  db:
+    image: postgres:17
+    container_name: network-assessment-postgres
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      # The persistant storage for the PostgreSQL database
+      - postgres_data:/var/lib/postgresql/data
+      # The initialization scripts for the PostgreSQL database
+      - ./database:/docker-entrypoint-initdb.d:ro
+
+volumes:
+  postgres_data:
+    name: network_assessment_postgres_data
