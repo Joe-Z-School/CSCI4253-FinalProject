@@ -21,10 +21,10 @@ def run_tcp_connectivity(target_ip, ports):
     for port in ports:
         if is_port_open(target_ip, port):
             print(f"Port {port} on {target_ip} is OPEN")
-            results.append({"port": port, "status": "OPEN"})
+            results.append({"port": port, 'metric_name': "availability","metric_value": 1, "unit": "status"})
         else:
             print(f"Port {port} on {target_ip} is CLOSED or filtered")
-            results.append({"port": port, "status": "CLOSED or filtered"})
+            results.append({"port": port, 'metric_name': "availability","metric_value": 0, "unit": "status"})
 
     logging.info(f"TCP connectivity results for {target_ip}: {results}")
     return results
