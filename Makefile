@@ -28,6 +28,21 @@ db-reset:
 db-logs:
 	$(COMPOSE) logs -f db
 
+redis-up:
+	$(COMPOSE) up -d redis
+
+redis-down:
+	$(COMPOSE) stop redis
+
 # Run the management console Flask application
 run:
 	python3 api/app.py
+
+
+# Testing and running the database using the terminal:
+# docker compose exec db psql -U network-assessment_user -d network-assessment_db
+
+# To look inside the redis container:
+# docker exec -it network-assessment-redis redis-cli
+# KEYS *
+# LRANGE assessment_queue 0 -1
