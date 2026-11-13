@@ -31,18 +31,40 @@ def get_connection():
         row_factory=dict_row
     )
 
+def update_assessment_status(assessment_id):
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute("""
+                    UPDATE assessments
+                    SET status = 'completed',
+                    completed_at = CURRENT_TIMESTAMP
+                    WHERE assessment_id = %s
+                    AND status = 'running';
+                    """, (assessment_id,))
+            logging.info(f"Marked assessment {assessment_id} as completed")
+
+def store_results(assessment_id, results):
+    logging.info('Attempting to put results into assessment_results table')
+    for test_type, data in results.items():
+        with get_connection() as conn:
+            with conn.cursor() as cursor:            
+                cursor.execute("""
+                    INSERT INTO assessment_results (assessment_id, test_type, metric_name, metric_value, unit, details)
+                    VALUES (%s, %s, %s, %s, %s, %s);
+                """, (assessment_id, test_type, data[0]['metric_name'], data[0]['metric_value'], data[0]['unit'], json.dumps(data)))
+                conn.commit()
+            
+
+    update_assessment_status(assessment_id)
 
 while True:
-    result = redisClient.brpop('assessment_queue', timeout=5)
+    queuename, assessment_request = redisClient.brpop('assessment_queue', timeout=0)
 
-    if result is None:
+    if assessment_request is None:
         continue
 
-    queuename, assessment_request = result
-    
     if assessment_request:
         assessment_id = json.loads(assessment_request)['assessment_id']
-        # Process the assessment here
         logging.info(f"Processing assessment {assessment_id}")
         
 
@@ -94,14 +116,30 @@ while True:
                 """, (assessment_id,))
 
                 assessment = cursor.fetchone()
+                logging.info(f"Fetched assessment: {assessment}")
+
+                results = {}
 
                 if 'tcp_connectivity' in assessment['test_types']:
-                    run_tcp_connectivity(assessment['target_ip'], assessment['ports'])
-                if 'latency' in assessment['test_types']:
-                    run_latency(assessment['target_ip'])
-                if 'throughput' in assessment['test_types']:
-                    run_throughput(assessment['target_ip'])
-                if 'packetloss' in assessment['test_types']:
-                    run_packetloss(assessment['target_ip'])
+                    tcp_results = run_tcp_connectivity(assessment['target_ip'], assessment['ports'])
+                    results['tcp_connectivity'] = tcp_results
+                    logging.info(f"Ran TCP connectivity test for assessment {assessment['assessment_id']}")
 
-                logging.info(f"Fetched assessment: {assessment}")
+                if 'latency' in assessment['test_types']:
+                    latency_results = run_latency(assessment['target_ip'])
+                    results['latency'] = latency_results
+                    logging.info(f"Ran latency test for assessment {assessment['assessment_id']}")
+
+                if 'throughput' in assessment['test_types']:
+                    throughput_results = run_throughput(assessment['target_ip'])
+                    results['throughput'] = throughput_results
+                    logging.info(f"Ran throughput test for assessment {assessment['assessment_id']}")
+                    
+                if 'packetloss' in assessment['test_types']:
+                    packetloss_results = run_packetloss(assessment['target_ip'])
+                    results['packetloss'] = packetloss_results
+                    logging.info(f"Ran packet loss test for assessment {assessment['assessment_id']}")
+
+                # Store the combined results
+                logging.info(f"Combined results for assessment {assessment['assessment_id']}: {results}")
+                store_results(assessment['assessment_id'], results)
