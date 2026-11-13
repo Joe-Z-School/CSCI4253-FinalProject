@@ -26,10 +26,55 @@ def get_connection():
 '''
 Get all the assessments from the database
 '''
-def get_all_assessments():
+def get_all_assessments(target_id=None):
+    query = """
+            SELECT
+                a.assessment_id,
+                a.target_id,
+                t.name AS target_name,
+                t.ip_address::text AS target_ip,
+                a.agent_id,
+                ag.name AS agent_name,
+                a.status,
+                a.created_at,
+                a.started_at,
+                a.completed_at,
+                a.error_message,
+    
+                COALESCE(
+                    (
+                        SELECT ARRAY_AGG(at.test_type ORDER BY at.test_type)
+                        FROM assessment_tests at
+                        WHERE at.assessment_id = a.assessment_id
+                    ),
+                    ARRAY[]::VARCHAR[]
+                ) AS test_types,
+    
+                COALESCE(
+                    (
+                        SELECT ARRAY_AGG(ap.port ORDER BY ap.port)
+                        FROM assessment_ports ap
+                        WHERE ap.assessment_id = a.assessment_id
+                    ),
+                    ARRAY[]::INTEGER[]
+                ) AS ports
+    
+            FROM assessments a
+            JOIN targets t ON a.target_id = t.target_id
+            LEFT JOIN agents ag ON a.agent_id = ag.agent_id
+        """
+    
+    params = []
+    
+    if target_id is not None:
+        query += " WHERE a.target_id = %s"
+        params.append(target_id)
+
+    query += " ORDER BY a.created_at DESC;"
+    
     with get_connection() as conn:
         with conn.cursor() as cursor:
-            cursor.execute("SELECT * FROM assessments ORDER BY assessment_id;")
+            cursor.execute(query, params)
             return cursor.fetchall()
 
 
@@ -51,7 +96,7 @@ def get_assessment(assessment_id):
 '''
 Validate the data for a new assessment before inserting it into the database
 '''
-def new_assessment_validation(assessment_data):
+def create_assessment_validation(assessment_data):
     # Ensure the assessment_data contains the required fields
     if 'target_id' not in assessment_data:
         raise ValueError("assessment_data must contain 'target_id'")
@@ -98,8 +143,8 @@ When creating a new assessment, assessment_data should contain:
 - test_type [List of types of tests to be performed]
 - ports [List of ports to be tested for TCP connectivity]
 '''
-def new_assessment(assessment_data):
-    new_assessment_validation(assessment_data)
+def create_assessment(assessment_data):
+    create_assessment_validation(assessment_data)
 
     newly_created_assessment_id = None
     with get_connection() as conn:
@@ -110,7 +155,7 @@ def new_assessment(assessment_data):
                 RETURNING assessment_id
             """, (assessment_data['target_id'],))
             newly_created_assessment_id = cursor.fetchone()['assessment_id']
-            new_assessment_test(cursor, assessment_data, newly_created_assessment_id)
+            create_assessment_test(cursor, assessment_data, newly_created_assessment_id)
 
     return newly_created_assessment_id
 
@@ -126,7 +171,7 @@ The assessment_data should contain the 'test_type' field which should be one of 
 The expected_assessment_id is the ID that was just created when the assessment was requested by a user
 and input into the assessments table
 '''
-def new_assessment_test(cursor, assessment_data, expected_assessment_id):
+def create_assessment_test(cursor, assessment_data, expected_assessment_id):
     # Create a new entry for each of the test types requested
     for test_type in assessment_data['test_type']:
         cursor.execute("""
@@ -137,7 +182,7 @@ def new_assessment_test(cursor, assessment_data, expected_assessment_id):
 
         # If the test type is TCP connectivity, add the ports to the assessment_ports table
         if test_type == 'tcp_connectivity':
-            new_port_testing(cursor, assessment_data, expected_assessment_id)
+            create_port_testing(cursor, assessment_data, expected_assessment_id)
 
 
 '''
@@ -145,10 +190,29 @@ This function adds the ports for a given assessment to the assessment_ports tabl
 The assessment_data should contain the 'ports' field which is a list of ports to be tested.
 The expected_assessment_id is the ID of the assessment that was just created.
 '''
-def new_port_testing(cursor, assessment_data, expected_assessment_id):
+def create_port_testing(cursor, assessment_data, expected_assessment_id):
     # For each port requesting to be tested, add it to the assessment_ports table
     for port in assessment_data['ports']:
         cursor.execute("""
             INSERT INTO assessment_ports (assessment_id, port)
             VALUES (%s, %s)
         """, (expected_assessment_id,port))
+
+'''
+This function updates an existing assessment in the database.
+The assessment_id is the ID of the assessment to be updated.
+The assessment_data contains the new data for the assessment, including the 'target_id' field.
+The function returns the updated assessment ID.
+'''
+def update_assessment(assessment_id, assessment_data):
+
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute("""
+                UPDATE assessments
+                SET target_id = %s
+                WHERE assessment_id = %s
+                RETURNING assessment_id
+            """, (assessment_data['target_id'], assessment_id))
+            updated_assessment_id = cursor.fetchone()['assessment_id']
+            return updated_assessment_id
