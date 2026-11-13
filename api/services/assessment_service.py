@@ -3,9 +3,14 @@ import os
 import logging
 import psycopg
 from psycopg.rows import dict_row
+import redis
+import json
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logging.getLogger('psycopg').setLevel(logging.INFO)
+
+redisClient = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
+redisListName = 'assessment_queue'
 
 
 '''
@@ -156,6 +161,11 @@ def create_assessment(assessment_data):
             """, (assessment_data['target_id'],))
             newly_created_assessment_id = cursor.fetchone()['assessment_id']
             create_assessment_test(cursor, assessment_data, newly_created_assessment_id)
+
+    # Add the new assessment request to the Redis queue
+    job = {"assessment_id": newly_created_assessment_id}
+    
+    redisClient.lpush(redisListName, json.dumps(job))
 
     return newly_created_assessment_id
 
