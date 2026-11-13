@@ -27,7 +27,7 @@
     {% block extra_css %}{% endblock %}
 </head>
 
-<body class="bg-light">
+<body class="bg-dark">
 
     <!-- Top Navigation -->
     <nav class="navbar navbar-dark bg-dark px-3">
@@ -48,9 +48,9 @@
         <div class="row">
 
             <!-- Sidebar -->
-            <aside class="col-md-2 col-lg-2 bg-white border-end min-vh-100 p-3">
+            <aside class="col-md-2 col-lg-2 bg-dark border-end min-vh-100 p-3">
 
-                <div class="text-uppercase text-muted small fw-bold mb-3">
+                <div class="text-uppercase text-light small fw-bold mb-3">
                     Navigation
                 </div>
 
@@ -59,7 +59,7 @@
                     <li class="nav-item">
                         <a
                             href="{{ url_for('dashboard.index') }}"
-                            class="nav-link text-dark {% if request.endpoint == 'dashboard.index' %}active{% endif %}"
+                            class="nav-link text-light {% if request.endpoint == 'dashboard.index' %}active{% endif %}"
                         >
                             <i class="bi bi-speedometer2 me-2"></i>
                             Dashboard
@@ -69,7 +69,7 @@
                     <li class="nav-item">
                         <a
                             href="{{ url_for('assessment.assessment_index') }}"
-                            class="nav-link text-dark {% if request.blueprint == 'assessment' %}active{% endif %}"
+                            class="nav-link text-light {% if request.blueprint == 'assessment' %}active{% endif %}"
                         >
                             <i class="bi bi-clipboard-data me-2"></i>
                             Assessments
@@ -77,14 +77,14 @@
                     </li>
 
                     <li class="nav-item">
-                        <a href="#" class="nav-link text-dark">
+                        <a href="#" class="nav-link text-light">
                             <i class="bi bi-hdd-network me-2"></i>
                             Targets
                         </a>
                     </li>
 
                     <li class="nav-item">
-                        <a href="#" class="nav-link text-dark">
+                        <a href="#" class="nav-link text-light">
                             <i class="bi bi-pc-display me-2"></i>
                             Agents
                         </a>
@@ -92,23 +92,23 @@
 
                 </ul>
 
-                <hr>
+                <hr class="border-light">
 
-                <div class="text-uppercase text-muted small fw-bold mb-3">
+                <div class="text-uppercase text-light small fw-bold mb-3">
                     System
                 </div>
 
                 <ul class="nav nav-pills flex-column gap-2">
 
                     <li class="nav-item">
-                        <a href="#" class="nav-link text-dark">
+                        <a href="#" class="nav-link text-light">
                             <i class="bi bi-activity me-2"></i>
                             System Status
                         </a>
                     </li>
 
                     <li class="nav-item">
-                        <a href="#" class="nav-link text-dark">
+                        <a href="#" class="nav-link text-light">
                             <i class="bi bi-gear me-2"></i>
                             Settings
                         </a>
@@ -143,6 +143,7 @@
     ></script>
 
     <!-- Page-specific JavaScript -->
+    {% block scripts %}{% endblock %}
     {% block extra_js %}{% endblock %}
 
 </body>

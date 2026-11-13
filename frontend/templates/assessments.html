@@ -3,15 +3,15 @@
 {% block title %}Assessments | Network Assessment Monitor{% endblock %}
 
 {% block page_header %}
-<div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3" data-bs-theme="dark">
     <div>
-        <h1 class="h3 mb-1">Assessments</h1>
+        <h1 class="h3 mb-1 text-light">Assessments</h1>
         <p class="text-muted mb-0">
             View and manage your network assessments.
         </p>
     </div>
 
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newAssessmentModal">
+    <button type="button" class="btn btn-outline-primary theme-primary" data-bs-toggle="modal" data-bs-target="#newAssessmentModal">
         <i class="bi bi-plus-lg me-1"></i>
         New Assessment
     </button>
@@ -21,7 +21,7 @@
 {% block content %}
 
 <!-- Assessment Statistics -->
-<div class="row g-3 mb-4">
+<div class="row g-3 mb-4" data-bs-theme="dark">
 
     <div class="col-md-6 col-xl">
         <div class="card shadow-sm h-100">
@@ -96,7 +96,7 @@
 </div>
 
 <!-- Assessment Table -->
-<div class="card shadow-sm">
+<div class="card shadow-sm" data-bs-theme="dark">
 
     <div class="card-header py-3">
         <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
@@ -131,10 +131,10 @@
         </div>
     </div>
 
-    <div class="table-responsive">
+    <div class="table-responsive" data-bs-theme="dark">
         <table class="table table-hover align-middle mb-0" id="assessmentsTable">
 
-            <thead class="table-light">
+            <thead class="table-dark">
                 <tr>
                     <th class="ps-3">Assessment</th>
                     <th>Target</th>
@@ -264,9 +264,10 @@
                         <p class="text-muted mb-3">
                             You haven't submitted any network assessments yet.
                         </p>
-                        <a href="{{ url_for('assessment.assessment_new') }}" class="btn btn-primary">
-                            <i class="bi bi-plus-lg me-2"></i>Create Your First Assessment
-                        </a>
+                        <button type="button" class="btn btn-outline-primary theme-primary" data-bs-toggle="modal" data-bs-target="#newAssessmentModal">
+                            <i class="bi bi-plus-lg me-1"></i>
+                            Create Your First Assessment
+                        </button>
                     </td>
                 </tr>
                 {% endfor %}
@@ -315,8 +316,8 @@
 
                     <!-- Error Message -->
                     <div id="assessmentError"
-                         class="alert alert-danger d-none"
-                         role="alert">
+                        class="alert alert-danger d-none"
+                        role="alert">
                     </div>
 
                     <!-- Target Selection -->
@@ -352,47 +353,39 @@
                                    name="test_type"
                                    value="tcp_connectivity">
 
-                            <label class="form-check-label"
-                                   for="tcpConnectivity">
+                            <label class="form-check-label" for="tcpConnectivity">
                                 TCP Connectivity
                             </label>
                         </div>
 
                         <div class="form-check mb-2">
                             <input class="form-check-input"
-                                   type="checkbox"
-                                   id="latency"
-                                   name="test_type"
-                                   value="latency">
+                                type="checkbox"
+                                id="latency"
+                                name="test_type"
+                                value="latency">
 
-                            <label class="form-check-label"
-                                   for="latency">
+                            <label class="form-check-label" for="latency">
                                 Latency
                             </label>
                         </div>
 
                         <div class="form-check mb-2">
                             <input class="form-check-input"
-                                   type="checkbox"
-                                   id="throughput"
-                                   name="test_type"
-                                   value="throughput">
+                                type="checkbox"
+                                id="throughput"
+                                name="test_type"
+                                value="throughput">
 
-                            <label class="form-check-label"
-                                   for="throughput">
+                            <label class="form-check-label" for="throughput">
                                 Throughput
                             </label>
                         </div>
 
                         <div class="form-check mb-2">
-                            <input class="form-check-input"
-                                   type="checkbox"
-                                   id="packetLoss"
-                                   name="test_type"
-                                   value="packet_loss">
+                            <input class="form-check-input" type="checkbox" id="packetLoss" name="test_type" value="packet_loss">
 
-                            <label class="form-check-label"
-                                   for="packetLoss">
+                            <label class="form-check-label" for="packetLoss">
                                 Packet Loss
                             </label>
                         </div>
@@ -404,10 +397,7 @@
                             TCP Ports
                         </label>
 
-                        <input type="text"
-                               class="form-control"
-                               id="portsInput"
-                               placeholder="Example: 22, 80, 443">
+                        <input type="text" class="form-control" id="portsInput" placeholder="Example: 22, 80, 443">
 
                         <div class="form-text text-secondary">
                             Enter one or more ports separated by commas.
@@ -440,6 +430,9 @@
 
 {% endblock %}
 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/assessment.js') }}"></script>
+{% endblock %}
 {% block extra_js %}
 <script>
     const searchInput = document.getElementById('assessmentSearch');
