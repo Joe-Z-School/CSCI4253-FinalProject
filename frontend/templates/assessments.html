@@ -1,0 +1,480 @@
+{% extends 'base.html' %}
+
+{% block title %}Assessments | Network Assessment Monitor{% endblock %}
+
+{% block page_header %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+    <div>
+        <h1 class="h3 mb-1">Assessments</h1>
+        <p class="text-muted mb-0">
+            View and manage your network assessments.
+        </p>
+    </div>
+
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newAssessmentModal">
+        <i class="bi bi-plus-lg me-1"></i>
+        New Assessment
+    </button>
+</div>
+{% endblock %}
+
+{% block content %}
+
+<!-- Assessment Statistics -->
+<div class="row g-3 mb-4">
+
+    <div class="col-md-6 col-xl">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted mb-1">Total</p>
+                        <h3 class="mb-0">{{ total_assessments }}</h3>
+                    </div>
+                    <i class="bi bi-clipboard-data fs-2 text-primary"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted mb-1">Completed</p>
+                        <h3 class="mb-0">{{ completed_assessments }}</h3>
+                    </div>
+                    <i class="bi bi-check-circle fs-2 text-success"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted mb-1">Running</p>
+                        <h3 class="mb-0">{{ running_assessments }}</h3>
+                    </div>
+                    <i class="bi bi-arrow-repeat fs-2 text-info"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted mb-1">Pending</p>
+                        <h3 class="mb-0">{{ pending_assessments }}</h3>
+                    </div>
+                    <i class="bi bi-clock fs-2 text-warning"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xl">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="text-muted mb-1">Failed</p>
+                        <h3 class="mb-0">{{ failed_assessments }}</h3>
+                    </div>
+                    <i class="bi bi-exclamation-circle fs-2 text-danger"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Assessment Table -->
+<div class="card shadow-sm">
+
+    <div class="card-header py-3">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div>
+                <h5 class="mb-0">All Assessments</h5>
+                <small class="text-muted">
+                    Review submitted and completed network assessments.
+                </small>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2">
+                <div class="input-group" style="max-width: 260px;">
+                    <span class="input-group-text">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="assessmentSearch"
+                        placeholder="Search assessments..."
+                    >
+                </div>
+
+                <select class="form-select" id="statusFilter" style="max-width: 160px;">
+                    <option value="all">All Statuses</option>
+                    <option value="pending">Pending</option>
+                    <option value="running">Running</option>
+                    <option value="completed">Completed</option>
+                    <option value="failed">Failed</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0" id="assessmentsTable">
+
+            <thead class="table-light">
+                <tr>
+                    <th class="ps-3">Assessment</th>
+                    <th>Target</th>
+                    <th>Tests</th>
+                    <th>Ports</th>
+                    <th>Worker</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th class="text-end pe-3">Details</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for assessment in assessments %}
+                <tr
+                    data-status="{{ assessment.status }}"
+                    class="assessment-row"
+                >
+                    <td class="ps-3">
+                        <span class="fw-semibold">
+                            #{{ assessment.assessment_id }}
+                        </span>
+                    </td>
+
+                    <td>
+                        <div class="fw-semibold">
+                            {{ assessment.target_name }}
+                        </div>
+                        <small class="text-muted">
+                            {{ assessment.target_ip }}
+                        </small>
+                    </td>
+
+                    <td>
+                        {% for test in assessment.test_types %}
+                            {% if test == 'tcp_connectivity' %}
+                                <span class="badge bg-primary-subtle text-primary mb-1">
+                                    TCP
+                                </span>
+                            {% elif test == 'latency' %}
+                                <span class="badge bg-info-subtle text-info-emphasis mb-1">
+                                    Latency
+                                </span>
+                            {% elif test == 'throughput' %}
+                                <span class="badge bg-success-subtle text-success mb-1">
+                                    Throughput
+                                </span>
+                            {% elif test == 'packet_loss' %}
+                                <span class="badge bg-warning-subtle text-warning-emphasis mb-1">
+                                    Packet Loss
+                                </span>
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+
+                    <td>
+                        {% if assessment.ports %}
+                            {% for port in assessment.ports %}
+                                <span class="badge bg-secondary-subtle text-secondary-emphasis mb-1">
+                                    {{ port }}
+                                </span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="text-muted">N/A</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% if assessment.agent_name %}
+                            <span>
+                                <i class="bi bi-pc-display-horizontal me-1 text-muted"></i>
+                                {{ assessment.agent_name }}
+                            </span>
+                        {% else %}
+                            <span class="text-muted">
+                                Unassigned
+                            </span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% if assessment.status == 'completed' %}
+                            <span class="badge rounded-pill bg-success">
+                                <i class="bi bi-check-circle me-1"></i>Completed
+                            </span>
+                        {% elif assessment.status == 'running' %}
+                            <span class="badge rounded-pill bg-info text-dark">
+                                <i class="bi bi-arrow-repeat me-1"></i>Running
+                            </span>
+                        {% elif assessment.status == 'failed' %}
+                            <span class="badge rounded-pill bg-danger">
+                                <i class="bi bi-x-circle me-1"></i>Failed
+                            </span>
+                        {% else %}
+                            <span class="badge rounded-pill bg-warning text-dark">
+                                <i class="bi bi-clock me-1"></i>Pending
+                            </span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        <span class="text-nowrap">
+                            {{ assessment.created_at.strftime('%b %d, %Y') if assessment.created_at else 'N/A' }}
+                        </span>
+                        <br>
+                        <small class="text-muted">
+                            {{ assessment.created_at.strftime('%I:%M %p') if assessment.created_at else '' }}
+                        </small>
+                    </td>
+
+                    <td class="text-end pe-3">
+                        <a
+                            href="{{ url_for('assessment.assessment_detail', assessment_id=assessment.assessment_id) }}"
+                            class="btn btn-sm btn-outline-primary"
+                            title="View assessment details"
+                        >
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </td>
+                </tr>
+
+                {% else %}
+                <tr id="emptyAssessments">
+                    <td colspan="8" class="text-center py-5">
+                        <i class="bi bi-clipboard-x fs-1 text-muted"></i>
+                        <h5 class="mt-3">No Assessments Found</h5>
+                        <p class="text-muted mb-3">
+                            You haven't submitted any network assessments yet.
+                        </p>
+                        <a href="{{ url_for('assessment.assessment_new') }}" class="btn btn-primary">
+                            <i class="bi bi-plus-lg me-2"></i>Create Your First Assessment
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+
+                <tr id="noFilterResults" style="display: none;">
+                    <td colspan="8" class="text-center text-muted py-4">
+                        No assessments match your search.
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card-footer text-muted small">
+        Showing {{ total_assessments }} assessment(s)
+    </div>
+
+</div>
+
+
+<!-- New Assessment Modal -->
+<div class="modal fade" id="newAssessmentModal" tabindex="-1"
+     aria-labelledby="newAssessmentModalLabel" aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content bg-dark text-white">
+
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title" id="newAssessmentModalLabel">
+                    Create New Assessment
+                </h5>
+
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+            </div>
+
+            <form id="newAssessmentForm"
+                  data-targets-url="{{ url_for('targets.get_targets') }}"
+                  data-create-url="{{ url_for('assessment.create_assessment') }}">
+
+                <div class="modal-body">
+
+                    <!-- Error Message -->
+                    <div id="assessmentError"
+                         class="alert alert-danger d-none"
+                         role="alert">
+                    </div>
+
+                    <!-- Target Selection -->
+                    <div class="mb-4">
+                        <label for="targetSelect" class="form-label">
+                            Target
+                        </label>
+
+                        <select class="form-select"
+                                id="targetSelect"
+                                name="target_id"
+                                required>
+                            <option value="">Loading targets...</option>
+                        </select>
+
+                        <div class="form-text text-secondary">
+                            Select the approved target to assess.
+                        </div>
+                    </div>
+
+                    <hr class="border-secondary">
+
+                    <!-- Assessment Tests -->
+                    <div class="mb-4">
+                        <label class="form-label">
+                            Assessment Tests
+                        </label>
+
+                        <div class="form-check mb-2">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   id="tcpConnectivity"
+                                   name="test_type"
+                                   value="tcp_connectivity">
+
+                            <label class="form-check-label"
+                                   for="tcpConnectivity">
+                                TCP Connectivity
+                            </label>
+                        </div>
+
+                        <div class="form-check mb-2">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   id="latency"
+                                   name="test_type"
+                                   value="latency">
+
+                            <label class="form-check-label"
+                                   for="latency">
+                                Latency
+                            </label>
+                        </div>
+
+                        <div class="form-check mb-2">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   id="throughput"
+                                   name="test_type"
+                                   value="throughput">
+
+                            <label class="form-check-label"
+                                   for="throughput">
+                                Throughput
+                            </label>
+                        </div>
+
+                        <div class="form-check mb-2">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   id="packetLoss"
+                                   name="test_type"
+                                   value="packet_loss">
+
+                            <label class="form-check-label"
+                                   for="packetLoss">
+                                Packet Loss
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- TCP Ports -->
+                    <div class="mb-3 d-none" id="portsSection">
+                        <label for="portsInput" class="form-label">
+                            TCP Ports
+                        </label>
+
+                        <input type="text"
+                               class="form-control"
+                               id="portsInput"
+                               placeholder="Example: 22, 80, 443">
+
+                        <div class="form-text text-secondary">
+                            Enter one or more ports separated by commas.
+                            Valid range: 1–65535.
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer border-secondary">
+                    <button type="button"
+                            class="btn btn-outline-secondary"
+                            data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+
+                    <button type="submit"
+                            class="btn btn-primary"
+                            id="createAssessmentBtn">
+                        <i class="bi bi-plus-lg me-1"></i>
+                        Create Assessment
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const searchInput = document.getElementById('assessmentSearch');
+    const statusFilter = document.getElementById('statusFilter');
+    const assessmentRows = document.querySelectorAll('.assessment-row');
+    const noResults = document.getElementById('noFilterResults');
+
+    function filterAssessments() {
+        const searchText = searchInput.value.toLowerCase();
+        const selectedStatus = statusFilter.value;
+
+        let visibleCount = 0;
+
+        assessmentRows.forEach(row => {
+            const rowText = row.textContent.toLowerCase();
+            const rowStatus = row.dataset.status;
+
+            const matchesSearch = rowText.includes(searchText);
+            const matchesStatus =
+                selectedStatus === 'all' || rowStatus === selectedStatus;
+
+            const shouldShow = matchesSearch && matchesStatus;
+
+            row.style.display = shouldShow ? '' : 'none';
+
+            if (shouldShow) {
+                visibleCount++;
+            }
+        });
+
+        noResults.style.display =
+            visibleCount === 0 && assessmentRows.length > 0 ? '' : 'none';
+    }
+
+    searchInput.addEventListener('input', filterAssessments);
+    statusFilter.addEventListener('change', filterAssessments);
+</script>
+{% endblock %}
