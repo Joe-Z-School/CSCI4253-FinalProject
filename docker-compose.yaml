@@ -20,6 +20,17 @@ services:
       # The initialization scripts for the PostgreSQL database
       - ./database:/docker-entrypoint-initdb.d:ro
 
+  redis:
+    image: redis:7
+    container_name: network-assessment-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
 volumes:
   postgres_data:
     name: network_assessment_postgres_data
+  redis_data:
+    name: network_assessment_redis_data
