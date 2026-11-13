@@ -20,8 +20,8 @@ db-down:
 # Stop the PostgreSQL database container and delete its persistent data
 db-reset:
 	$(COMPOSE) stop db
-	docker rm dna-exposure-monitor-postgres
-	docker volume rm dna_exposure_monitor_postgres_data
+	docker rm network-assessment-postgres
+	docker volume rm network_assessment_postgres_data
 	$(COMPOSE) up -d db
 
 # View the logs of the database
