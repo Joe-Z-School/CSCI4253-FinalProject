@@ -61,7 +61,33 @@ Example: /assessment/123 will render the detail page for the assessment with ID 
 '''
 @assessment_bp.route('/assessment/<int:assessment_id>', methods=['GET'])
 def assessment_detail(assessment_id):
-    return render_template('assessment_detail.html', assessment_id=assessment_id)
+
+    data = assessment_service.get_assessment_details(assessment_id)
+
+    if not data:
+        return render_template(
+            '404.html',
+            message='Assessment not found.'
+        ), 404
+
+    assessment = data['assessment']
+    results = data['results']
+
+    # Calculate assessment duration
+    duration = None
+
+    if assessment['started_at'] and assessment['completed_at']:
+        duration = (
+            assessment['completed_at'] -
+            assessment['started_at']
+        ).total_seconds()
+
+    return render_template(
+        'assessment_detail.html',
+        assessment=assessment,
+        results=results,
+        duration=duration
+    )
 
 
 

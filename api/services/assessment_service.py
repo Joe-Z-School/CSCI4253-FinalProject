@@ -226,3 +226,96 @@ def update_assessment(assessment_id, assessment_data):
             """, (assessment_data['target_id'], assessment_id))
             updated_assessment_id = cursor.fetchone()['assessment_id']
             return updated_assessment_id
+
+
+'''
+This function willretrieve an assessment and all its associated results from the database.
+The assessment_id is the ID of the assessment to be retrieved.
+The function returns a dictionary containing the assessment and its results.
+'''
+def get_assessment_details(assessment_id):
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+
+            # Retrieve assessment information
+            cursor.execute("""
+                SELECT
+                    a.assessment_id,
+                    a.status,
+                    a.created_at,
+                    a.started_at,
+                    a.completed_at,
+                    a.error_message,
+
+                    t.target_id,
+                    t.name AS target_name,
+                    host(t.ip_address) AS ip_address,
+                    t.location AS target_location,
+                    t.description AS target_description,
+
+                    ag.agent_id,
+                    ag.name AS agent_name,
+                    ag.location AS agent_location,
+                    ag.last_seen_at
+
+                FROM assessments a
+                JOIN targets t
+                    ON a.target_id = t.target_id
+                LEFT JOIN agents ag
+                    ON a.agent_id = ag.agent_id
+
+                WHERE a.assessment_id = %s
+            """, (assessment_id,))
+
+            assessment = cursor.fetchone()
+
+            # Assessment does not exist
+            if not assessment:
+                return None
+
+            # Retrieve configured tests
+            cursor.execute("""
+                SELECT test_type
+                FROM assessment_tests
+                WHERE assessment_id = %s
+                ORDER BY test_type
+            """, (assessment_id,))
+
+            tests = cursor.fetchall()
+
+            # Retrieve configured ports
+            cursor.execute("""
+                SELECT port
+                FROM assessment_ports
+                WHERE assessment_id = %s
+                ORDER BY port
+            """, (assessment_id,))
+
+            ports = cursor.fetchall()
+
+            # Retrieve assessment results
+            cursor.execute("""
+                SELECT
+                    result_id,
+                    port,
+                    test_type,
+                    metric_name,
+                    metric_value,
+                    unit,
+                    details,
+                    measured_at
+                FROM assessment_results
+                WHERE assessment_id = %s
+                ORDER BY measured_at
+            """, (assessment_id,))
+
+            results = cursor.fetchall()
+
+            # Add configuration information to assessment
+            assessment['tests'] = tests
+            assessment['ports'] = ports
+
+            return {
+                'assessment': assessment,
+                'results': results
+            }
