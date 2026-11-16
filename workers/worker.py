@@ -32,29 +32,60 @@ def get_connection():
     )
 
 def update_assessment_status(assessment_id):
+
     with get_connection() as conn:
         with conn.cursor() as cursor:
             cursor.execute("""
-                    UPDATE assessments
-                    SET status = 'completed',
+                UPDATE assessments
+                SET status = 'completed',
                     completed_at = CURRENT_TIMESTAMP
-                    WHERE assessment_id = %s
-                    AND status = 'running';
-                    """, (assessment_id,))
-            logging.info(f"Marked assessment {assessment_id} as completed")
+                WHERE assessment_id = %s
+                AND status = 'running'
+                RETURNING assessment_id, status, completed_at;
+            """, (assessment_id,))
+
+            updated_assessment = cursor.fetchone()
+
+            if updated_assessment:
+                logging.info(f"Successfully updated assessment: {updated_assessment}")
+            else:
+                logging.warning(
+                    f"No assessment updated for ID {assessment_id}. "
+                    "Check whether the record exists and has running status."
+                )
+
+            conn.commit()
 
 def store_results(assessment_id, results):
-    logging.info('Attempting to put results into assessment_results table')
-    for test_type, data in results.items():
-        with get_connection() as conn:
-            with conn.cursor() as cursor:            
-                cursor.execute("""
-                    INSERT INTO assessment_results (assessment_id, test_type, metric_name, metric_value, unit, details)
-                    VALUES (%s, %s, %s, %s, %s, %s);
-                """, (assessment_id, test_type, data[0]['metric_name'], data[0]['metric_value'], data[0]['unit'], json.dumps(data)))
-                conn.commit()
-            
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
 
+            for test_type, data in results.items():
+                for entry in data:
+
+                    cursor.execute("""
+                        INSERT INTO assessment_results (
+                            assessment_id,
+                            test_type,
+                            metric_name,
+                            metric_value,
+                            unit,
+                            details
+                        )
+                        VALUES (%s, %s, %s, %s, %s, %s);
+                    """, (
+                        assessment_id,
+                        test_type,
+                        entry['metric_name'],
+                        entry['metric_value'],
+                        entry['unit'],
+                        json.dumps(entry)
+                    ))
+
+        # Commit all results to database
+        conn.commit()
+
+    # Mark the assessment complete when the results are stored
     update_assessment_status(assessment_id)
 
 while True:
@@ -79,6 +110,7 @@ while True:
                     AND status = 'pending'
                     RETURNING assessment_id;
                     """, (assessment_id,))
+                conn.commit()
 
                 claimed_assessment = cursor.fetchone()
                 if not claimed_assessment:
@@ -90,7 +122,7 @@ while True:
                         a.assessment_id,
                         a.status,
                         t.name AS target_name,
-                        t.ip_address::text AS target_ip,
+                        host(t.ip_address) AS target_ip,
 
                         COALESCE(
                             (
