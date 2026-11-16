@@ -37,7 +37,7 @@ def get_all_assessments(target_id=None):
                 a.assessment_id,
                 a.target_id,
                 t.name AS target_name,
-                t.ip_address::text AS target_ip,
+                host(t.ip_address) AS target_ip,
                 a.agent_id,
                 ag.name AS agent_name,
                 a.status,
