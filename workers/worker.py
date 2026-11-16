@@ -66,15 +66,17 @@ def store_results(assessment_id, results):
                     cursor.execute("""
                         INSERT INTO assessment_results (
                             assessment_id,
+                            port,
                             test_type,
                             metric_name,
                             metric_value,
                             unit,
                             details
                         )
-                        VALUES (%s, %s, %s, %s, %s, %s);
+                        VALUES (%s, %s, %s, %s, %s, %s, %s);
                     """, (
                         assessment_id,
+                        entry['port'],
                         test_type,
                         entry['metric_name'],
                         entry['metric_value'],
