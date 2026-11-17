@@ -76,7 +76,7 @@ def store_results(assessment_id, results):
                         VALUES (%s, %s, %s, %s, %s, %s, %s);
                     """, (
                         assessment_id,
-                        entry['port'],
+                        entry.get('port'),
                         test_type,
                         entry['metric_name'],
                         entry['metric_value'],
@@ -169,9 +169,9 @@ while True:
                     results['throughput'] = throughput_results
                     logging.info(f"Ran throughput test for assessment {assessment['assessment_id']}")
                     
-                if 'packetloss' in assessment['test_types']:
+                if 'packet_loss' in assessment['test_types']:
                     packetloss_results = run_packetloss(assessment['target_ip'])
-                    results['packetloss'] = packetloss_results
+                    results['packet_loss'] = packetloss_results
                     logging.info(f"Ran packet loss test for assessment {assessment['assessment_id']}")
 
                 # Store the combined results
