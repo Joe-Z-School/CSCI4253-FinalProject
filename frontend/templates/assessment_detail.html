@@ -5,179 +5,304 @@
 Assessment #{{ assessment.assessment_id }} | Network Assessment Monitor
 {% endblock %}
 
+
 {% block page_header %}
-<div class="d-flex flex-wrap justify-content-between align-items-center gap-3"
-     data-bs-theme="dark">
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
 
     <div>
+
         <a href="{{ url_for('assessment.assessment_index') }}"
-           class="text-decoration-none text-muted small">
+           class="text-decoration-none small"
+           style="color: var(--neon-blue);">
+
             <i class="bi bi-arrow-left me-1"></i>
             Back to Assessments
+
         </a>
 
-        <h1 class="h3 text-light mt-2 mb-1">
+        <div class="text-uppercase small mt-3 mb-2"
+             style="color: var(--neon-blue); letter-spacing: 2px;">
+
+            ASSESSMENT DETAILS
+
+        </div>
+
+        <h1 class="h3 mb-1">
             Assessment #{{ assessment.assessment_id }}
         </h1>
 
-        <p class="text-muted mb-0">
-            {{ assessment.target_name }} · {{ assessment.target_ip }}
+        <p class="mb-0 text-muted">
+            <i class="bi bi-hdd-network me-1"></i>
+            {{ assessment.target_name }}
+            <span class="mx-1">/</span>
+            {{ assessment.ip_address }}
         </p>
+
     </div>
 
+
+    <!-- Assessment Status -->
     <div>
+
         {% if assessment.status == 'completed' %}
-            <span class="badge rounded-pill bg-success fs-6 px-3 py-2">
+
+            <span class="badge rounded-pill status-completed fs-6 px-3 py-2">
                 <i class="bi bi-check-circle me-1"></i>
                 Completed
             </span>
+
         {% elif assessment.status == 'running' %}
-            <span class="badge rounded-pill bg-info text-dark fs-6 px-3 py-2">
+
+            <span class="badge rounded-pill status-running fs-6 px-3 py-2">
                 <i class="bi bi-arrow-repeat me-1"></i>
                 Running
             </span>
+
         {% elif assessment.status == 'failed' %}
-            <span class="badge rounded-pill bg-danger fs-6 px-3 py-2">
+
+            <span class="badge rounded-pill status-failed fs-6 px-3 py-2">
                 <i class="bi bi-x-circle me-1"></i>
                 Failed
             </span>
+
         {% else %}
-            <span class="badge rounded-pill bg-warning text-dark fs-6 px-3 py-2">
+
+            <span class="badge rounded-pill status-pending fs-6 px-3 py-2">
                 <i class="bi bi-clock me-1"></i>
                 Pending
             </span>
+
         {% endif %}
+
     </div>
 
 </div>
+
 {% endblock %}
 
 
 {% block content %}
 
-<div class="row g-4" data-bs-theme="dark">
+<div class="row g-4">
 
-    <!-- LEFT COLUMN -->
+
+    <!-- =========================================
+         LEFT COLUMN
+         ========================================= -->
+
     <div class="col-lg-4">
 
-        <!-- Target Information -->
-        <div class="card shadow-sm mb-4">
+
+        <!-- TARGET INFORMATION -->
+        <div class="card mb-4">
 
             <div class="card-header py-3">
+
                 <h5 class="mb-0">
-                    <i class="bi bi-hdd-network me-2 text-primary"></i>
+                    <i class="bi bi-hdd-network me-2"
+                       style="color: var(--neon-blue);"></i>
                     Target Information
                 </h5>
+
             </div>
+
 
             <div class="card-body">
 
                 <div class="mb-3">
-                    <small class="text-muted">Target Name</small>
-                    <div class="fw-semibold">
+
+                    <small class="stat-label">
+                        TARGET NAME
+                    </small>
+
+                    <div class="fw-semibold mt-1">
                         {{ assessment.target_name }}
                     </div>
+
                 </div>
+
 
                 <div class="mb-3">
-                    <small class="text-muted">IP Address</small>
-                    <div class="fw-semibold">
+
+                    <small class="stat-label">
+                        IP ADDRESS
+                    </small>
+
+                    <div class="fw-semibold mt-1 font-monospace"
+                         style="color: var(--neon-blue-bright);">
+
+                        <i class="bi bi-globe2 me-1"></i>
                         {{ assessment.ip_address }}
+
                     </div>
+
                 </div>
 
+
                 <div>
-                    <small class="text-muted">Location</small>
-                    <div>
+
+                    <small class="stat-label">
+                        LOCATION
+                    </small>
+
+                    <div class="mt-1">
                         {{ assessment.target_location or 'N/A' }}
                     </div>
+
                 </div>
 
             </div>
+
         </div>
 
 
-        <!-- Worker Information -->
-        <div class="card shadow-sm mb-4">
+
+        <!-- WORKER INFORMATION -->
+        <div class="card mb-4">
 
             <div class="card-header py-3">
+
                 <h5 class="mb-0">
-                    <i class="bi bi-pc-display-horizontal me-2 text-primary"></i>
+                    <i class="bi bi-pc-display-horizontal me-2"
+                       style="color: var(--neon-blue);"></i>
                     Assigned Worker
                 </h5>
+
             </div>
+
 
             <div class="card-body">
 
                 {% if assessment.agent_id %}
 
+
                     <div class="mb-3">
-                        <small class="text-muted">Worker Name</small>
-                        <div class="fw-semibold">
+
+                        <small class="stat-label">
+                            WORKER NAME
+                        </small>
+
+                        <div class="fw-semibold mt-1">
+                            <i class="bi bi-pc-display me-1"
+                               style="color: var(--neon-blue);"></i>
+
                             {{ assessment.agent_name }}
                         </div>
+
                     </div>
+
 
                     <div class="mb-3">
-                        <small class="text-muted">Location</small>
-                        <div>
+
+                        <small class="stat-label">
+                            LOCATION
+                        </small>
+
+                        <div class="mt-1">
                             {{ assessment.agent_location or 'N/A' }}
                         </div>
+
                     </div>
 
+
                     <div>
-                        <small class="text-muted">Last Seen</small>
-                        <div>
+
+                        <small class="stat-label">
+                            LAST SEEN
+                        </small>
+
+                        <div class="mt-1">
+
                             {% if assessment.agent_last_seen %}
+
                                 {{ assessment.agent_last_seen.strftime('%b %d, %Y %I:%M:%S %p') }}
+
                             {% else %}
+
                                 N/A
+
                             {% endif %}
+
                         </div>
+
                     </div>
+
 
                 {% else %}
 
-                    <p class="text-muted mb-0">
-                        <i class="bi bi-info-circle me-1"></i>
-                        No worker has been assigned yet.
-                    </p>
+                    <div class="text-center py-3">
+
+                        <i class="bi bi-pc-display fs-2 text-muted"></i>
+
+                        <p class="text-muted mt-2 mb-0">
+                            No worker has been assigned yet.
+                        </p>
+
+                    </div>
 
                 {% endif %}
 
             </div>
+
         </div>
 
 
-        <!-- Configured Tests -->
-        <div class="card shadow-sm mb-4">
+
+        <!-- CONFIGURED TESTS -->
+        <div class="card mb-4">
 
             <div class="card-header py-3">
+
                 <h5 class="mb-0">
-                    <i class="bi bi-clipboard-check me-2 text-primary"></i>
+                    <i class="bi bi-clipboard-check me-2"
+                       style="color: var(--neon-blue);"></i>
                     Configured Tests
                 </h5>
+
             </div>
+
 
             <div class="card-body">
 
                 {% for test in assessment.tests %}
 
-                    <div class="d-flex align-items-center gap-2 mb-3">
+                    <div class="d-flex align-items-center gap-3 mb-3">
 
-                        <i class="bi bi-check-circle-fill text-success"></i>
+                        <div class="rounded p-2"
+                             style="background: rgba(0, 191, 255, 0.10);">
 
-                        {% if test.test_type == 'tcp_connectivity' %}
-                            TCP Connectivity
-                        {% elif test.test_type == 'latency' %}
-                            Latency
-                        {% elif test.test_type == 'throughput' %}
-                            Throughput
-                        {% elif test.test_type == 'packet_loss' %}
-                            Packet Loss
-                        {% else %}
-                            {{ test }}
-                        {% endif %}
+                            <i class="bi bi-check2-square"
+                               style="color: var(--neon-blue);"></i>
+
+                        </div>
+
+
+                        <div class="fw-semibold">
+
+                            {% if test.test_type == 'tcp_connectivity' %}
+
+                                TCP Connectivity
+
+                            {% elif test.test_type == 'latency' %}
+
+                                Latency
+
+                            {% elif test.test_type == 'throughput' %}
+
+                                Throughput
+
+                            {% elif test.test_type == 'packet_loss' %}
+
+                                Packet Loss
+
+                            {% else %}
+
+                                {{ test.test_type }}
+
+                            {% endif %}
+
+                        </div>
 
                     </div>
 
@@ -189,20 +314,26 @@ Assessment #{{ assessment.assessment_id }} | Network Assessment Monitor
 
                 {% endfor %}
 
+
                 {% if assessment.ports %}
 
-                    <hr class="border-secondary">
+                    <hr>
 
-                    <small class="text-muted d-block mb-2">
-                        Configured TCP Ports
+
+                    <small class="stat-label d-block mb-3">
+                        CONFIGURED TCP PORTS
                     </small>
+
 
                     <div class="d-flex flex-wrap gap-2">
 
                         {% for port in assessment.ports %}
-                            <span class="badge bg-secondary">
+
+                            <span class="badge port-badge">
+                                <i class="bi bi-ethernet me-1"></i>
                                 {{ port.port }}
                             </span>
+
                         {% endfor %}
 
                     </div>
@@ -210,84 +341,189 @@ Assessment #{{ assessment.assessment_id }} | Network Assessment Monitor
                 {% endif %}
 
             </div>
+
         </div>
 
     </div>
 
 
-    <!-- RIGHT COLUMN -->
+
+    <!-- =========================================
+         RIGHT COLUMN
+         ========================================= -->
+
     <div class="col-lg-8">
 
-        <!-- Assessment Timeline -->
-        <div class="card shadow-sm mb-4">
+
+        <!-- ASSESSMENT TIMELINE -->
+        <div class="card mb-4">
 
             <div class="card-header py-3">
+
                 <h5 class="mb-0">
-                    <i class="bi bi-clock-history me-2 text-primary"></i>
+                    <i class="bi bi-clock-history me-2"
+                       style="color: var(--neon-blue);"></i>
                     Assessment Timeline
                 </h5>
+
             </div>
+
 
             <div class="card-body">
 
                 <div class="row g-3">
 
+
+                    <!-- Created -->
                     <div class="col-md-6">
-                        <small class="text-muted">Created</small>
-                        <div class="fw-semibold">
-                            {{ assessment.created_at.strftime('%b %d, %Y %I:%M:%S %p') if assessment.created_at else 'N/A' }}
+
+                        <div class="rounded p-3 h-100"
+                             style="background: var(--neon-panel-light); border: 1px solid var(--neon-border);">
+
+                            <small class="stat-label">
+                                CREATED
+                            </small>
+
+                            <div class="fw-semibold mt-2">
+
+                                <i class="bi bi-calendar-plus me-1"
+                                   style="color: var(--neon-blue);"></i>
+
+                                {{ assessment.created_at.strftime('%b %d, %Y %I:%M:%S %p') if assessment.created_at else 'N/A' }}
+
+                            </div>
+
                         </div>
+
                     </div>
 
+
+                    <!-- Started -->
                     <div class="col-md-6">
-                        <small class="text-muted">Started</small>
-                        <div class="fw-semibold">
-                            {{ assessment.started_at.strftime('%b %d, %Y %I:%M:%S %p') if assessment.started_at else 'Not started' }}
+
+                        <div class="rounded p-3 h-100"
+                             style="background: var(--neon-panel-light); border: 1px solid var(--neon-border);">
+
+                            <small class="stat-label">
+                                STARTED
+                            </small>
+
+                            <div class="fw-semibold mt-2">
+
+                                <i class="bi bi-play-circle me-1"
+                                   style="color: var(--neon-blue);"></i>
+
+                                {{ assessment.started_at.strftime('%b %d, %Y %I:%M:%S %p') if assessment.started_at else 'Not started' }}
+
+                            </div>
+
                         </div>
+
                     </div>
 
+
+                    <!-- Completed -->
                     <div class="col-md-6">
-                        <small class="text-muted">Completed</small>
-                        <div class="fw-semibold">
-                            {{ assessment.completed_at.strftime('%b %d, %Y %I:%M:%S %p') if assessment.completed_at else 'Not completed' }}
+
+                        <div class="rounded p-3 h-100"
+                             style="background: var(--neon-panel-light); border: 1px solid var(--neon-border);">
+
+                            <small class="stat-label">
+                                COMPLETED
+                            </small>
+
+                            <div class="fw-semibold mt-2">
+
+                                <i class="bi bi-check-circle me-1"
+                                   style="color: var(--neon-green);"></i>
+
+                                {{ assessment.completed_at.strftime('%b %d, %Y %I:%M:%S %p') if assessment.completed_at else 'Not completed' }}
+
+                            </div>
+
                         </div>
+
                     </div>
 
+
+                    <!-- Duration -->
                     <div class="col-md-6">
-                        <small class="text-muted">Execution Duration</small>
-                        <div class="fw-semibold">
-                            {% if duration is not none %}
-                                {{ "%.2f"|format(duration) }} seconds
-                            {% elif assessment.status == 'running' %}
-                                In progress
-                            {% else %}
-                                N/A
-                            {% endif %}
+
+                        <div class="rounded p-3 h-100"
+                             style="background: var(--neon-panel-light); border: 1px solid var(--neon-border);">
+
+                            <small class="stat-label">
+                                EXECUTION DURATION
+                            </small>
+
+                            <div class="fw-semibold mt-2">
+
+                                <i class="bi bi-stopwatch me-1"
+                                   style="color: var(--neon-blue);"></i>
+
+                                {% if duration is not none %}
+
+                                    {{ "%.2f"|format(duration) }} seconds
+
+                                {% elif assessment.status == 'running' %}
+
+                                    In progress
+
+                                {% else %}
+
+                                    N/A
+
+                                {% endif %}
+
+                            </div>
+
                         </div>
+
                     </div>
 
                 </div>
 
             </div>
+
         </div>
 
 
-        <!-- Error Information -->
+
+        <!-- ERROR INFORMATION -->
         {% if assessment.status == 'failed' or assessment.error_message %}
 
-            <div class="card border-danger shadow-sm mb-4">
+            <div class="card mb-4"
+                 style="border-color: var(--neon-red);">
 
-                <div class="card-header text-danger py-3">
-                    <h5 class="mb-0">
+                <div class="card-header py-3"
+                     style="background: rgba(255, 85, 114, 0.08);">
+
+                    <h5 class="mb-0 text-danger">
+
                         <i class="bi bi-exclamation-triangle me-2"></i>
                         Assessment Error
+
                     </h5>
+
                 </div>
 
+
                 <div class="card-body">
-                    <p class="text-danger mb-0">
-                        {{ assessment.error_message or 'The assessment failed without an error message.' }}
-                    </p>
+
+                    <div class="d-flex gap-3">
+
+                        <i class="bi bi-x-octagon fs-3 text-danger"></i>
+
+                        <div>
+
+                            <p class="mb-0">
+                                {{ assessment.error_message or 'The assessment failed without an error message.' }}
+                            </p>
+
+                        </div>
+
+                    </div>
+
                 </div>
 
             </div>
@@ -295,55 +531,98 @@ Assessment #{{ assessment.assessment_id }} | Network Assessment Monitor
         {% endif %}
 
 
-        <!-- Assessment Results -->
-        <div class="card shadow-sm mb-4">
 
-            <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                <div>
-                    <h5 class="mb-0">
-                        <i class="bi bi-graph-up me-2 text-primary"></i>
-                        Assessment Results
-                    </h5>
+        <!-- =========================================
+             ASSESSMENT RESULTS
+             ========================================= -->
 
-                    <small class="text-muted">
-                        Measurements collected during assessment execution.
-                    </small>
+        <div class="card mb-4">
+
+            <div class="card-header py-3">
+
+                <div class="d-flex justify-content-between align-items-center">
+
+                    <div>
+
+                        <h5 class="mb-1">
+                            <i class="bi bi-graph-up me-2"
+                               style="color: var(--neon-blue);"></i>
+                            Assessment Results
+                        </h5>
+
+                        <small class="text-muted">
+                            Measurements collected during assessment execution.
+                        </small>
+
+                    </div>
+
+
+                    <span class="badge test-badge">
+                        <i class="bi bi-database me-1"></i>
+                        {{ results|length }} Result(s)
+                    </span>
+
                 </div>
 
-                <span class="badge bg-secondary">
-                    {{ results|length }} Result(s)
-                </span>
             </div>
+
 
             <div class="card-body">
 
                 {% if results %}
 
+
                     {% for test_type, test_results in results|groupby('test_type') %}
 
                         <div class="mb-4">
 
-                            <h6 class="text-light border-bottom border-secondary pb-2 mb-3">
-                                {% if test_type == 'tcp_connectivity' %}
-                                    <i class="bi bi-hdd-network me-2 text-primary"></i>
-                                    TCP Connectivity
-                                {% elif test_type == 'latency' %}
-                                    <i class="bi bi-speedometer2 me-2 text-info"></i>
-                                    Latency
-                                {% elif test_type == 'throughput' %}
-                                    <i class="bi bi-arrow-left-right me-2 text-success"></i>
-                                    Throughput
-                                {% elif test_type == 'packet_loss' %}
-                                    <i class="bi bi-reception-3 me-2 text-warning"></i>
-                                    Packet Loss
-                                {% else %}
-                                    {{ test_type }}
-                                {% endif %}
-                            </h6>
 
+                            <!-- Test Type Heading -->
+                            <div class="d-flex align-items-center gap-2 border-bottom pb-3 mb-3"
+                                 style="border-color: var(--neon-border) !important;">
+
+                                {% if test_type == 'tcp_connectivity' %}
+
+                                    <i class="bi bi-hdd-network fs-5"
+                                       style="color: var(--neon-blue);"></i>
+
+                                    <h6 class="mb-0">TCP Connectivity</h6>
+
+                                {% elif test_type == 'latency' %}
+
+                                    <i class="bi bi-speedometer2 fs-5"
+                                       style="color: var(--neon-blue);"></i>
+
+                                    <h6 class="mb-0">Latency</h6>
+
+                                {% elif test_type == 'throughput' %}
+
+                                    <i class="bi bi-arrow-left-right fs-5"
+                                       style="color: var(--neon-green);"></i>
+
+                                    <h6 class="mb-0">Throughput</h6>
+
+                                {% elif test_type == 'packet_loss' %}
+
+                                    <i class="bi bi-reception-3 fs-5"
+                                       style="color: var(--neon-yellow);"></i>
+
+                                    <h6 class="mb-0">Packet Loss</h6>
+
+                                {% else %}
+
+                                    <h6 class="mb-0">{{ test_type }}</h6>
+
+                                {% endif %}
+
+                            </div>
+
+
+
+                            <!-- Results Table -->
                             <div class="table-responsive">
 
-                                <table class="table table-hover align-middle">
+                                <table class="table table-hover align-middle mb-0">
 
                                     <thead>
                                         <tr>
@@ -354,57 +633,121 @@ Assessment #{{ assessment.assessment_id }} | Network Assessment Monitor
                                         </tr>
                                     </thead>
 
+
                                     <tbody>
 
                                         {% for result in test_results %}
 
                                             <tr>
 
+                                                <!-- Metric -->
                                                 <td class="fw-semibold">
                                                     {{ result.metric_name }}
                                                 </td>
 
+
+                                                <!-- Value -->
                                                 <td>
+
                                                     {% if result.test_type == 'tcp_connectivity' and result.metric_name == 'availability' %}
 
                                                         {% if result.metric_value == 1 %}
-                                                            <span class="badge bg-success">Open</span>
+
+                                                            <span class="badge bg-success">
+                                                                <i class="bi bi-check-circle me-1"></i>
+                                                                Open
+                                                            </span>
+
                                                         {% elif result.metric_value == 0 %}
-                                                            <span class="badge bg-danger">Closed / Filtered</span>
+
+                                                            <span class="badge bg-danger">
+                                                                <i class="bi bi-x-circle me-1"></i>
+                                                                Closed / Filtered
+                                                            </span>
+
                                                         {% else %}
-                                                            <span class="badge bg-secondary">Unknown</span>
+
+                                                            <span class="badge bg-secondary">
+                                                                Unknown
+                                                            </span>
+
                                                         {% endif %}
 
                                                     {% else %}
-                                                        {{ result.metric_value if result.metric_value is not none else 'N/A' }}
-                                                        {{ result.unit or '' }}
+
+                                                        <span class="fw-semibold"
+                                                              style="color: var(--neon-blue-bright);">
+
+                                                            {{ result.metric_value if result.metric_value is not none else 'N/A' }}
+
+                                                        </span>
+
+                                                        <span class="text-muted">
+                                                            {{ result.unit or '' }}
+                                                        </span>
+
                                                     {% endif %}
+
                                                 </td>
 
+
+                                                <!-- Port -->
                                                 <td>
-                                                    {{ result.port if result.port else 'N/A' }}
+
+                                                    {% if result.port %}
+
+                                                        <span class="badge port-badge">
+                                                            {{ result.port }}
+                                                        </span>
+
+                                                    {% else %}
+
+                                                        <span class="text-muted">N/A</span>
+
+                                                    {% endif %}
+
                                                 </td>
 
+
+                                                <!-- Measurement Time -->
                                                 <td class="text-nowrap">
+
                                                     <small class="text-muted">
+
                                                         {{ result.measured_at.strftime('%I:%M:%S %p') if result.measured_at else 'N/A' }}
+
                                                     </small>
+
                                                 </td>
 
                                             </tr>
 
+
+                                            <!-- Additional Details -->
                                             {% if result.details %}
 
                                                 <tr>
+
                                                     <td colspan="4">
+
                                                         <details>
-                                                            <summary class="text-muted small">
+
+                                                            <summary class="small"
+                                                                     style="color: var(--neon-blue); cursor: pointer;">
+
+                                                                <i class="bi bi-code-square me-1"></i>
                                                                 View Additional Details
+
                                                             </summary>
 
-                                                            <pre class="bg-dark border border-secondary rounded p-3 mt-2 mb-0 small text-light"><code>{{ result.details | tojson(indent=2) }}</code></pre>
+
+                                                            <pre class="rounded p-3 mt-3 mb-0 small text-light"
+                                                                 style="background: #080d14; border: 1px solid var(--neon-border); overflow-x: auto;"><code>{{ result.details | tojson(indent=2) }}</code></pre>
+
                                                         </details>
+
                                                     </td>
+
                                                 </tr>
 
                                             {% endif %}
@@ -421,9 +764,13 @@ Assessment #{{ assessment.assessment_id }} | Network Assessment Monitor
 
                     {% endfor %}
 
+
                 {% else %}
 
+
+                    <!-- No Results State -->
                     <div class="text-center py-5">
+
 
                         {% if assessment.status == 'running' %}
 
@@ -437,6 +784,7 @@ Assessment #{{ assessment.assessment_id }} | Network Assessment Monitor
                                 Results will appear once measurements are collected.
                             </p>
 
+
                         {% elif assessment.status == 'pending' %}
 
                             <i class="bi bi-clock fs-1 text-warning"></i>
@@ -448,6 +796,7 @@ Assessment #{{ assessment.assessment_id }} | Network Assessment Monitor
                             <p class="text-muted mb-0">
                                 This assessment has not started yet.
                             </p>
+
 
                         {% else %}
 
@@ -465,9 +814,11 @@ Assessment #{{ assessment.assessment_id }} | Network Assessment Monitor
 
                     </div>
 
+
                 {% endif %}
 
             </div>
+
         </div>
 
     </div>

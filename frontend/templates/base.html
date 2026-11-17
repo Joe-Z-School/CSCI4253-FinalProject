@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,62 +7,58 @@
 
     <title>{% block title %}Network Assessment Monitor{% endblock %}</title>
 
-    <!-- Bootstrap CSS -->
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
         rel="stylesheet"
     >
 
-    <!-- Bootstrap Icons -->
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
         rel="stylesheet"
     >
 
-    <!-- Custom CSS -->
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='css/styles.css') }}"
-    >
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
     {% block extra_css %}{% endblock %}
 </head>
 
-<body class="bg-dark">
+<body class="neon-body">
 
     <!-- Top Navigation -->
-    <nav class="navbar navbar-dark bg-dark px-3">
-        <a class="navbar-brand fw-semibold" href="#">
-            <i class="bi bi-shield-check me-2"></i>
-            Network Assessment Monitor
+    <nav class="navbar neon-topbar px-4">
+        <a class="navbar-brand neon-brand fw-semibold" href="{{ url_for('dashboard.index') }}">
+            <i class="bi bi-shield-lock me-2"></i>
+            NETWORK<span>_</span>MONITOR
         </a>
 
-        <div class="d-flex align-items-center">
-            <span class="text-light small">
-                Management Console
+        <div class="d-flex align-items-center gap-4">
+            <div class="system-indicator">
+                <span class="status-dot"></span>
+                SYSTEM ONLINE
+            </div>
+
+            <span class="topbar-label d-none d-sm-inline">
+                MANAGEMENT CONSOLE
             </span>
         </div>
     </nav>
-
 
     <div class="container-fluid">
         <div class="row">
 
             <!-- Sidebar -->
-            <aside class="col-md-2 col-lg-2 bg-dark border-end min-vh-100 p-3">
+            <aside class="col-md-2 col-lg-2 neon-sidebar p-3">
 
-                <div class="text-uppercase text-light small fw-bold mb-3">
-                    Navigation
-                </div>
+                <div class="sidebar-heading">MAIN MENU</div>
 
-                <ul class="nav nav-pills flex-column gap-2">
+                <ul class="nav nav-pills flex-column gap-2 mb-4">
 
                     <li class="nav-item">
                         <a
                             href="{{ url_for('dashboard.index') }}"
-                            class="nav-link text-light {% if request.endpoint == 'dashboard.index' %}active{% endif %}"
+                            class="nav-link neon-nav-link {% if request.endpoint == 'dashboard.index' %}active{% endif %}"
                         >
-                            <i class="bi bi-speedometer2 me-2"></i>
+                            <i class="bi bi-grid-1x2"></i>
                             Dashboard
                         </a>
                     </li>
@@ -69,80 +66,82 @@
                     <li class="nav-item">
                         <a
                             href="{{ url_for('assessment.assessment_index') }}"
-                            class="nav-link text-light {% if request.blueprint == 'assessment' %}active{% endif %}"
+                            class="nav-link neon-nav-link {% if request.blueprint == 'assessment' %}active{% endif %}"
                         >
-                            <i class="bi bi-clipboard-data me-2"></i>
+                            <i class="bi bi-clipboard-data"></i>
                             Assessments
                         </a>
                     </li>
 
                     <li class="nav-item">
-                        <a href="#" class="nav-link text-light">
-                            <i class="bi bi-hdd-network me-2"></i>
+                        <a href="#" class="nav-link neon-nav-link">
+                            <i class="bi bi-hdd-network"></i>
                             Targets
                         </a>
                     </li>
 
                     <li class="nav-item">
-                        <a href="#" class="nav-link text-light">
-                            <i class="bi bi-pc-display me-2"></i>
+                        <a href="#" class="nav-link neon-nav-link">
+                            <i class="bi bi-pc-display"></i>
                             Agents
                         </a>
                     </li>
 
                 </ul>
 
-                <hr class="border-light">
-
-                <div class="text-uppercase text-light small fw-bold mb-3">
-                    System
-                </div>
+                <div class="sidebar-heading">SYSTEM</div>
 
                 <ul class="nav nav-pills flex-column gap-2">
 
                     <li class="nav-item">
-                        <a href="#" class="nav-link text-light">
-                            <i class="bi bi-activity me-2"></i>
+                        <a href="#" class="nav-link neon-nav-link">
+                            <i class="bi bi-activity"></i>
                             System Status
                         </a>
                     </li>
 
                     <li class="nav-item">
-                        <a href="#" class="nav-link text-light">
-                            <i class="bi bi-gear me-2"></i>
+                        <a href="#" class="nav-link neon-nav-link">
+                            <i class="bi bi-gear"></i>
                             Settings
                         </a>
                     </li>
 
                 </ul>
 
+                <div class="sidebar-footer">
+                    <div class="sidebar-footer-line"></div>
+                    <div class="small">NETWORK ASSESSMENT MONITOR</div>
+                    <div class="sidebar-version">VERSION 1.0.0</div>
+                </div>
+
             </aside>
 
-
             <!-- Main Content -->
-            <main class="col-md-10 col-lg-10 px-4 py-4">
+            <main class="col-md-10 col-lg-10 neon-main px-4 py-4">
 
-                <!-- Page Header -->
-                <div class="mb-4">
+                <div class="page-heading mb-4">
                     {% block page_header %}{% endblock %}
                 </div>
 
-                <!-- Page Content -->
                 {% block content %}
                 {% endblock %}
+
+                <footer class="neon-footer mt-5">
+                    NETWORK ASSESSMENT MONITOR
+                    <span class="mx-2">/</span>
+                    DISTRIBUTED NETWORK ANALYSIS
+                </footer>
 
             </main>
 
         </div>
     </div>
 
-
-    <!-- Bootstrap JavaScript -->
     <script
         src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
     ></script>
 
-    <!-- Page-specific JavaScript -->
     {% block scripts %}{% endblock %}
     {% block extra_js %}{% endblock %}
 

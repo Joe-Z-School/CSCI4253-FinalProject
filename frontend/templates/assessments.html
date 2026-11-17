@@ -1,93 +1,148 @@
+
 {% extends 'base.html' %}
 
 {% block title %}Assessments | Network Assessment Monitor{% endblock %}
 
 {% block page_header %}
-<div class="d-flex flex-wrap justify-content-between align-items-center gap-3" data-bs-theme="dark">
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+
     <div>
-        <h1 class="h3 mb-1 text-light">Assessments</h1>
-        <p class="text-muted mb-0">
-            View and manage your network assessments.
+        <div class="text-uppercase small mb-2"
+             style="color: var(--neon-blue); letter-spacing: 2px;">
+            NETWORK ANALYSIS
+        </div>
+
+        <h1 class="h3 mb-1">Assessments</h1>
+
+        <p class="mb-0">
+            View, monitor, and manage your network assessments.
         </p>
     </div>
 
-    <button type="button" class="btn btn-outline-primary theme-primary" data-bs-toggle="modal" data-bs-target="#newAssessmentModal">
-        <i class="bi bi-plus-lg me-1"></i>
+    <button type="button"
+            class="btn btn-outline-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#newAssessmentModal">
+        <i class="bi bi-plus-lg me-2"></i>
         New Assessment
     </button>
+
 </div>
 {% endblock %}
 
+
 {% block content %}
 
-<!-- Assessment Statistics -->
-<div class="row g-3 mb-4" data-bs-theme="dark">
+<!-- =========================================
+     ASSESSMENT STATISTICS
+     ========================================= -->
 
+<div class="row g-3 mb-4">
+
+    <!-- Total -->
     <div class="col-md-6 col-xl">
-        <div class="card shadow-sm h-100">
+        <div class="card h-100">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
+
                     <div>
-                        <p class="text-muted mb-1">Total</p>
-                        <h3 class="mb-0">{{ total_assessments }}</h3>
+                        <p class="stat-label mb-2">Total Assessments</p>
+                        <h2 class="stat-value mb-0">
+                            {{ total_assessments }}
+                        </h2>
+                        <small class="text-muted">All submitted</small>
                     </div>
-                    <i class="bi bi-clipboard-data fs-2 text-primary"></i>
+
+                    <i class="bi bi-clipboard-data fs-1 stat-icon"></i>
+
                 </div>
             </div>
         </div>
     </div>
 
+
+    <!-- Completed -->
     <div class="col-md-6 col-xl">
-        <div class="card shadow-sm h-100">
+        <div class="card h-100">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
+
                     <div>
-                        <p class="text-muted mb-1">Completed</p>
-                        <h3 class="mb-0">{{ completed_assessments }}</h3>
+                        <p class="stat-label mb-2">Completed</p>
+                        <h2 class="stat-value mb-0">
+                            {{ completed_assessments }}
+                        </h2>
+                        <small class="text-muted">Successfully finished</small>
                     </div>
-                    <i class="bi bi-check-circle fs-2 text-success"></i>
+
+                    <i class="bi bi-check-circle fs-1 text-success"></i>
+
                 </div>
             </div>
         </div>
     </div>
 
+
+    <!-- Running -->
     <div class="col-md-6 col-xl">
-        <div class="card shadow-sm h-100">
+        <div class="card h-100">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
+
                     <div>
-                        <p class="text-muted mb-1">Running</p>
-                        <h3 class="mb-0">{{ running_assessments }}</h3>
+                        <p class="stat-label mb-2">Running</p>
+                        <h2 class="stat-value mb-0">
+                            {{ running_assessments }}
+                        </h2>
+                        <small class="text-muted">Currently processing</small>
                     </div>
-                    <i class="bi bi-arrow-repeat fs-2 text-info"></i>
+
+                    <i class="bi bi-arrow-repeat fs-1 text-info"></i>
+
                 </div>
             </div>
         </div>
     </div>
 
+
+    <!-- Pending -->
     <div class="col-md-6 col-xl">
-        <div class="card shadow-sm h-100">
+        <div class="card h-100">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
+
                     <div>
-                        <p class="text-muted mb-1">Pending</p>
-                        <h3 class="mb-0">{{ pending_assessments }}</h3>
+                        <p class="stat-label mb-2">Pending</p>
+                        <h2 class="stat-value mb-0">
+                            {{ pending_assessments }}
+                        </h2>
+                        <small class="text-muted">Awaiting processing</small>
                     </div>
-                    <i class="bi bi-clock fs-2 text-warning"></i>
+
+                    <i class="bi bi-clock fs-1 text-warning"></i>
+
                 </div>
             </div>
         </div>
     </div>
 
+
+    <!-- Failed -->
     <div class="col-md-6 col-xl">
-        <div class="card shadow-sm h-100">
+        <div class="card h-100">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
+
                     <div>
-                        <p class="text-muted mb-1">Failed</p>
-                        <h3 class="mb-0">{{ failed_assessments }}</h3>
+                        <p class="stat-label mb-2">Failed</p>
+                        <h2 class="stat-value mb-0">
+                            {{ failed_assessments }}
+                        </h2>
+                        <small class="text-muted">Require investigation</small>
                     </div>
-                    <i class="bi bi-exclamation-circle fs-2 text-danger"></i>
+
+                    <i class="bi bi-exclamation-circle fs-1 text-danger"></i>
+
                 </div>
             </div>
         </div>
@@ -95,23 +150,38 @@
 
 </div>
 
-<!-- Assessment Table -->
-<div class="card shadow-sm" data-bs-theme="dark">
+
+<!-- =========================================
+     ASSESSMENT TABLE
+     ========================================= -->
+
+<div class="card mb-4">
 
     <div class="card-header py-3">
+
         <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+
             <div>
-                <h5 class="mb-0">All Assessments</h5>
+                <h5 class="mb-1">
+                    <i class="bi bi-activity me-2"
+                       style="color: var(--neon-blue);"></i>
+                    All Assessments
+                </h5>
+
                 <small class="text-muted">
                     Review submitted and completed network assessments.
                 </small>
             </div>
 
+
+            <!-- Search and Filter -->
             <div class="d-flex flex-wrap gap-2">
+
                 <div class="input-group" style="max-width: 260px;">
                     <span class="input-group-text">
                         <i class="bi bi-search"></i>
                     </span>
+
                     <input
                         type="text"
                         class="form-control"
@@ -120,193 +190,332 @@
                     >
                 </div>
 
-                <select class="form-select" id="statusFilter" style="max-width: 160px;">
+
+                <select class="form-select"
+                        id="statusFilter"
+                        style="max-width: 160px;">
+
                     <option value="all">All Statuses</option>
                     <option value="pending">Pending</option>
                     <option value="running">Running</option>
                     <option value="completed">Completed</option>
                     <option value="failed">Failed</option>
+
                 </select>
+
             </div>
+
         </div>
+
     </div>
 
-    <div class="table-responsive" data-bs-theme="dark">
-        <table class="table table-hover align-middle mb-0" id="assessmentsTable">
 
-            <thead class="table-dark">
+    <!-- Assessment Records -->
+    <div class="table-responsive">
+
+        <table class="table table-hover align-middle mb-0"
+               id="assessmentsTable">
+
+            <thead>
                 <tr>
                     <th class="ps-3">Assessment</th>
                     <th>Target</th>
                     <th>Tests</th>
                     <th>Ports</th>
-                    <th>Worker</th>
+                    <th>Worker Agent</th>
                     <th>Status</th>
                     <th>Created</th>
                     <th class="text-end pe-3">Details</th>
                 </tr>
             </thead>
 
+
             <tbody>
+
                 {% for assessment in assessments %}
-                <tr
-                    data-status="{{ assessment.status }}"
-                    class="assessment-row"
-                >
+
+                <tr data-status="{{ assessment.status }}"
+                    class="assessment-row">
+
+                    <!-- Assessment ID -->
                     <td class="ps-3">
-                        <span class="fw-semibold">
+                        <span class="fw-semibold"
+                              style="color: var(--neon-blue-bright);">
                             #{{ assessment.assessment_id }}
                         </span>
                     </td>
 
+
+                    <!-- Target -->
                     <td>
                         <div class="fw-semibold">
                             {{ assessment.target_name }}
                         </div>
+
                         <small class="text-muted">
+                            <i class="bi bi-globe2 me-1"></i>
                             {{ assessment.target_ip }}
                         </small>
                     </td>
 
+
+                    <!-- Test Types -->
                     <td>
+
                         {% for test in assessment.test_types %}
+
                             {% if test == 'tcp_connectivity' %}
-                                <span class="badge bg-primary-subtle text-primary mb-1">
+                                <span class="badge test-badge mb-1">
                                     TCP
                                 </span>
+
                             {% elif test == 'latency' %}
-                                <span class="badge bg-info-subtle text-info-emphasis mb-1">
+                                <span class="badge test-badge mb-1">
                                     Latency
                                 </span>
+
                             {% elif test == 'throughput' %}
-                                <span class="badge bg-success-subtle text-success mb-1">
+                                <span class="badge test-badge mb-1">
                                     Throughput
                                 </span>
+
                             {% elif test == 'packet_loss' %}
-                                <span class="badge bg-warning-subtle text-warning-emphasis mb-1">
+                                <span class="badge test-badge mb-1">
                                     Packet Loss
                                 </span>
+
                             {% endif %}
+
                         {% endfor %}
+
                     </td>
 
+
+                    <!-- TCP Ports -->
                     <td>
+
                         {% if assessment.ports %}
+
                             {% for port in assessment.ports %}
-                                <span class="badge bg-secondary-subtle text-secondary-emphasis mb-1">
+                                <span class="badge port-badge mb-1">
                                     {{ port }}
                                 </span>
                             {% endfor %}
+
                         {% else %}
+
                             <span class="text-muted">N/A</span>
+
                         {% endif %}
+
                     </td>
 
+
+                    <!-- Worker Agent -->
                     <td>
+
                         {% if assessment.agent_name %}
+
                             <span>
-                                <i class="bi bi-pc-display-horizontal me-1 text-muted"></i>
+                                <i class="bi bi-pc-display-horizontal me-1"
+                                   style="color: var(--neon-blue);"></i>
+
                                 {{ assessment.agent_name }}
                             </span>
+
                         {% else %}
+
                             <span class="text-muted">
                                 Unassigned
                             </span>
+
                         {% endif %}
+
                     </td>
 
+
+                    <!-- Status -->
                     <td>
+                    
                         {% if assessment.status == 'completed' %}
-                            <span class="badge rounded-pill bg-success">
-                                <i class="bi bi-check-circle me-1"></i>Completed
+                    
+                            <span class="badge rounded-pill status-completed">
+                                <i class="bi bi-check-circle me-1"></i>
+                                Completed
                             </span>
+                        
                         {% elif assessment.status == 'running' %}
-                            <span class="badge rounded-pill bg-info text-dark">
-                                <i class="bi bi-arrow-repeat me-1"></i>Running
+                        
+                            <span class="badge rounded-pill status-running">
+                                <i class="bi bi-arrow-repeat me-1"></i>
+                                Running
                             </span>
+                        
                         {% elif assessment.status == 'failed' %}
-                            <span class="badge rounded-pill bg-danger">
-                                <i class="bi bi-x-circle me-1"></i>Failed
+                        
+                            <span class="badge rounded-pill status-failed">
+                                <i class="bi bi-x-circle me-1"></i>
+                                Failed
                             </span>
+                        
                         {% else %}
-                            <span class="badge rounded-pill bg-warning text-dark">
-                                <i class="bi bi-clock me-1"></i>Pending
+                        
+                            <span class="badge rounded-pill status-pending">
+                                <i class="bi bi-clock me-1"></i>
+                                Pending
                             </span>
+                        
                         {% endif %}
+                        
                     </td>
 
+
+                    <!-- Created Date -->
                     <td>
+
                         <span class="text-nowrap">
                             {{ assessment.created_at.strftime('%b %d, %Y') if assessment.created_at else 'N/A' }}
                         </span>
+
                         <br>
+
                         <small class="text-muted">
                             {{ assessment.created_at.strftime('%I:%M %p') if assessment.created_at else '' }}
                         </small>
+
                     </td>
 
+
+                    <!-- Details -->
                     <td class="text-end pe-3">
+
                         <a
                             href="{{ url_for('assessment.assessment_detail', assessment_id=assessment.assessment_id) }}"
                             class="btn btn-sm btn-outline-primary"
-                            title="View assessment details"
-                        >
+                            title="View assessment details">
+
                             <i class="bi bi-arrow-right"></i>
+
                         </a>
+
                     </td>
+
                 </tr>
 
+
                 {% else %}
+
                 <tr id="emptyAssessments">
+
                     <td colspan="8" class="text-center py-5">
-                        <i class="bi bi-clipboard-x fs-1 text-muted"></i>
-                        <h5 class="mt-3">No Assessments Found</h5>
+
+                        <i class="bi bi-clipboard-x fs-1"
+                           style="color: var(--neon-blue);"></i>
+
+                        <h5 class="mt-3">
+                            No Assessments Found
+                        </h5>
+
                         <p class="text-muted mb-3">
                             You haven't submitted any network assessments yet.
                         </p>
-                        <button type="button" class="btn btn-outline-primary theme-primary" data-bs-toggle="modal" data-bs-target="#newAssessmentModal">
+
+                        <button type="button"
+                                class="btn btn-outline-primary"
+                                data-bs-toggle="modal"
+                                data-bs-target="#newAssessmentModal">
+
                             <i class="bi bi-plus-lg me-1"></i>
                             Create Your First Assessment
+
                         </button>
+
                     </td>
+
                 </tr>
+
                 {% endfor %}
 
+
+                <!-- Search Empty State -->
                 <tr id="noFilterResults" style="display: none;">
-                    <td colspan="8" class="text-center text-muted py-4">
-                        No assessments match your search.
+
+                    <td colspan="8" class="text-center py-5">
+
+                        <i class="bi bi-search fs-2 text-muted"></i>
+
+                        <h5 class="mt-3">
+                            No Matching Assessments
+                        </h5>
+
+                        <p class="text-muted mb-0">
+                            Try changing your search or status filter.
+                        </p>
+
                     </td>
+
                 </tr>
 
             </tbody>
+
         </table>
+
     </div>
 
-    <div class="card-footer text-muted small">
-        Showing {{ total_assessments }} assessment(s)
+
+    <div class="card-footer d-flex justify-content-between align-items-center">
+
+        <small class="text-muted">
+            <i class="bi bi-database me-1"></i>
+            Showing {{ total_assessments }} assessment(s)
+        </small>
+
+        <small class="text-muted">
+            NETWORK ASSESSMENT RECORDS
+        </small>
+
     </div>
 
 </div>
 
 
-<!-- New Assessment Modal -->
-<div class="modal fade" id="newAssessmentModal" tabindex="-1"
-     aria-labelledby="newAssessmentModalLabel" aria-hidden="true">
+<!-- =========================================
+     NEW ASSESSMENT MODAL
+     ========================================= -->
+
+<div class="modal fade"
+     id="newAssessmentModal"
+     tabindex="-1"
+     aria-labelledby="newAssessmentModalLabel"
+     aria-hidden="true">
 
     <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content bg-dark text-white">
 
-            <div class="modal-header border-secondary">
-                <h5 class="modal-title" id="newAssessmentModalLabel">
-                    Create New Assessment
-                </h5>
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <div>
+                    <div class="text-uppercase small mb-1"
+                         style="color: var(--neon-blue); letter-spacing: 1.5px;">
+                        ASSESSMENT CONFIGURATION
+                    </div>
+
+                    <h5 class="modal-title" id="newAssessmentModalLabel">
+                        <i class="bi bi-plus-circle me-2"
+                           style="color: var(--neon-blue);"></i>
+                        Create New Assessment
+                    </h5>
+                </div>
 
                 <button type="button"
                         class="btn-close btn-close-white"
                         data-bs-dismiss="modal"
                         aria-label="Close">
                 </button>
+
             </div>
+
 
             <form id="newAssessmentForm"
                   data-targets-url="{{ url_for('targets.get_targets') }}"
@@ -316,98 +525,157 @@
 
                     <!-- Error Message -->
                     <div id="assessmentError"
-                        class="alert alert-danger d-none"
-                        role="alert">
+                         class="alert alert-danger d-none"
+                         role="alert">
                     </div>
+
 
                     <!-- Target Selection -->
                     <div class="mb-4">
+
                         <label for="targetSelect" class="form-label">
-                            Target
+                            <i class="bi bi-hdd-network me-1"
+                               style="color: var(--neon-blue);"></i>
+                            Assessment Target
                         </label>
 
                         <select class="form-select"
                                 id="targetSelect"
                                 name="target_id"
                                 required>
+
                             <option value="">Loading targets...</option>
+
                         </select>
 
-                        <div class="form-text text-secondary">
-                            Select the approved target to assess.
+                        <div class="form-text">
+                            Select an approved target for network assessment.
                         </div>
+
                     </div>
 
-                    <hr class="border-secondary">
+
+                    <hr>
+
 
                     <!-- Assessment Tests -->
                     <div class="mb-4">
+
                         <label class="form-label">
+                            <i class="bi bi-list-check me-1"
+                               style="color: var(--neon-blue);"></i>
                             Assessment Tests
                         </label>
 
+                        <p class="text-muted small mb-3">
+                            Select the network tests you want to execute.
+                        </p>
+
+
                         <div class="form-check mb-2">
+
                             <input class="form-check-input"
                                    type="checkbox"
                                    id="tcpConnectivity"
                                    name="test_type"
                                    value="tcp_connectivity">
 
-                            <label class="form-check-label" for="tcpConnectivity">
+                            <label class="form-check-label"
+                                   for="tcpConnectivity">
                                 TCP Connectivity
+                                <small class="text-muted d-block">
+                                    Test TCP port reachability.
+                                </small>
                             </label>
+
                         </div>
 
-                        <div class="form-check mb-2">
-                            <input class="form-check-input"
-                                type="checkbox"
-                                id="latency"
-                                name="test_type"
-                                value="latency">
 
-                            <label class="form-check-label" for="latency">
+                        <div class="form-check mb-2">
+
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   id="latency"
+                                   name="test_type"
+                                   value="latency">
+
+                            <label class="form-check-label"
+                                   for="latency">
                                 Latency
+                                <small class="text-muted d-block">
+                                    Measure network response time.
+                                </small>
                             </label>
+
                         </div>
 
+
                         <div class="form-check mb-2">
+
                             <input class="form-check-input"
-                                type="checkbox"
-                                id="throughput"
-                                name="test_type"
-                                value="throughput">
+                                   type="checkbox"
+                                   id="throughput"
+                                   name="test_type"
+                                   value="throughput">
 
-                            <label class="form-check-label" for="throughput">
+                            <label class="form-check-label"
+                                   for="throughput">
                                 Throughput
+                                <small class="text-muted d-block">
+                                    Measure network transfer performance.
+                                </small>
                             </label>
+
                         </div>
+
 
                         <div class="form-check mb-2">
-                            <input class="form-check-input" type="checkbox" id="packetLoss" name="test_type" value="packet_loss">
 
-                            <label class="form-check-label" for="packetLoss">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   id="packetLoss"
+                                   name="test_type"
+                                   value="packet_loss">
+
+                            <label class="form-check-label"
+                                   for="packetLoss">
                                 Packet Loss
+                                <small class="text-muted d-block">
+                                    Measure lost network packets.
+                                </small>
                             </label>
+
                         </div>
+
                     </div>
+
 
                     <!-- TCP Ports -->
                     <div class="mb-3 d-none" id="portsSection">
+
                         <label for="portsInput" class="form-label">
+                            <i class="bi bi-ethernet me-1"
+                               style="color: var(--neon-blue);"></i>
                             TCP Ports
                         </label>
 
-                        <input type="text" class="form-control" id="portsInput" placeholder="Example: 22, 80, 443">
+                        <input type="text"
+                               class="form-control"
+                               id="portsInput"
+                               placeholder="Example: 22, 80, 443">
 
-                        <div class="form-text text-secondary">
+                        <div class="form-text">
                             Enter one or more ports separated by commas.
                             Valid range: 1–65535.
                         </div>
+
                     </div>
 
                 </div>
 
-                <div class="modal-footer border-secondary">
+
+                <div class="modal-footer">
+
                     <button type="button"
                             class="btn btn-outline-secondary"
                             data-bs-dismiss="modal">
@@ -417,22 +685,30 @@
                     <button type="submit"
                             class="btn btn-primary"
                             id="createAssessmentBtn">
+
                         <i class="bi bi-plus-lg me-1"></i>
                         Create Assessment
+
                     </button>
+
                 </div>
 
             </form>
+
         </div>
+
     </div>
+
 </div>
 
-
 {% endblock %}
+
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/assessment.js') }}"></script>
 {% endblock %}
+
+
 {% block extra_js %}
 <script>
     const searchInput = document.getElementById('assessmentSearch');
