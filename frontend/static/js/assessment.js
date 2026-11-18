@@ -12,8 +12,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const errorMessage = document.getElementById("assessmentError");
     const createButton = document.getElementById("createAssessmentBtn");
 
+    const agentSelect = document.getElementById("agentSelect");
+
     // Load targets whenever the modal opens.
-    modal.addEventListener("show.bs.modal", loadTargets);
+    modal.addEventListener("show.bs.modal", () => {
+        loadTargets();
+        loadAgents();
+    });
 
     async function loadTargets() {
 
@@ -56,6 +61,53 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    async function loadAgents() {
+
+        agentSelect.innerHTML =
+            '<option value="">Loading workers...</option>';
+
+        agentSelect.disabled = true;
+
+        try {
+            const response = await fetch(form.dataset.agentsUrl);
+
+            if (!response.ok) {
+                throw new Error("Unable to retrieve workers.");
+            }
+
+            const agents = await response.json();
+
+            agentSelect.innerHTML =
+                '<option value="">Select a worker location</option>';
+
+            agents.forEach(agent => {
+
+                const option = document.createElement("option");
+
+                option.value = agent.agent_id;
+
+                option.textContent =
+                    `${agent.name} (${agent.location})`;
+
+                agentSelect.appendChild(option);
+            });
+
+            if (agents.length === 0) {
+                agentSelect.innerHTML =
+                    '<option value="">No enabled workers available</option>';
+            }
+
+            agentSelect.disabled = agents.length === 0;
+
+        } catch (error) {
+
+            agentSelect.innerHTML =
+                '<option value="">Failed to load workers</option>';
+
+            showError(error.message);
+        }
+    }
+
     // Show the port input only when TCP Connectivity is selected.
     tcpCheckbox.addEventListener("change", () => {
 
@@ -76,6 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
         hideError();
 
         const targetId = targetSelect.value;
+        const agentId = agentSelect.value;
 
         const selectedTests = Array.from(
             form.querySelectorAll('input[name="test_type"]:checked')
@@ -84,6 +137,11 @@ document.addEventListener("DOMContentLoaded", () => {
         // Basic validation.
         if (!targetId) {
             showError("Please select a target.");
+            return;
+        }
+        
+        if (!agentId) {
+            showError("Please select a worker location.");
             return;
         }
 
@@ -122,6 +180,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const assessmentData = {
             target_id: Number(targetId),
+            agent_id: Number(agentId),
             test_type: selectedTests,
             ports: ports
         };
