@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from routes.assessment import assessment_bp
 from routes.dashboard import dashboard_bp
 from routes.targets import targets_bp
-
+from routes.agents import agents_bp
 
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -31,7 +31,9 @@ app.register_blueprint(assessment_bp, url_prefix="/assessment")
 app.register_blueprint(dashboard_bp, url_prefix="/dashboard")
 
 
-app.register_blueprint(targets_bp, url_prefix="/api")
+app.register_blueprint(targets_bp, url_prefix="/targets")
+
+app.register_blueprint(agents_bp, url_prefix="/agents")
 
 
 if __name__ == "__main__":
