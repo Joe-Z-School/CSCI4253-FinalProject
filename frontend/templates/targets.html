@@ -1,0 +1,53 @@
+
+{% extends "base.html" %}
+
+{% block title %}Targets{% endblock %}
+
+{% block page_header %}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+
+    <div>
+        <div class="text-uppercase small mb-2"
+             style="color: var(--neon-blue); letter-spacing: 2px;">
+            INFORMATION
+        </div>
+
+        <h1 class="h3 mb-1">Targets</h1>
+
+        <p class="mb-0">
+            View, monitor, and manage your network targets.
+        </p>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block content %}
+    <h1>Targets</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Target ID</th>
+                <th>Name</th>
+                <th>Ip Address</th>
+                <th>Location</th>
+                <th>Description</th>
+                <th>Enabled</th>
+                <th>Created At</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for target in targets %}
+            <tr>
+                <td>{{ target.target_id }}</td>
+                <td>{{ target.name }}</td>
+                <td>{{ target.ip_address }}</td>
+                <td>{{ target.location }}</td>
+                <td>{{ target.description }}</td>
+                <td>{{ target.enabled }}</td>
+                <td>{{ target.created_at }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
