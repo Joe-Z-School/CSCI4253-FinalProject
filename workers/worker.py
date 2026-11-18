@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 from assessments.tcp_connectivity import run_tcp_connectivity
 from assessments.latency import run_latency
 from assessments.packetloss import run_packetloss
+from assessments.throughput import run_throughput
 
 # Load environment variables first
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '.'))
@@ -203,10 +204,10 @@ while True:
                         results['latency'] = latency_results
                         logging.info(f"Ran latency test for assessment {assessment['assessment_id']}")
 
-                    #if 'throughput' in assessment['test_types']:
-                    #    throughput_results = run_throughput(assessment['target_ip'])
-                    #    results['throughput'] = throughput_results
-                    #    logging.info(f"Ran throughput test for assessment {assessment['assessment_id']}")
+                    if 'throughput' in assessment['test_types']:
+                        throughput_results = run_throughput(assessment['target_ip'])
+                        results['throughput'] = throughput_results
+                        logging.info(f"Ran throughput test for assessment {assessment['assessment_id']}")
 
                     if 'packet_loss' in assessment['test_types']:
                         packetloss_results = run_packetloss(assessment['target_ip'])
