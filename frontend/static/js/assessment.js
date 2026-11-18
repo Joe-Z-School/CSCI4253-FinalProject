@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Load targets whenever the modal opens.
     modal.addEventListener("show.bs.modal", () => {
+        form.reset();
         loadTargets();
         loadAgents();
     });
