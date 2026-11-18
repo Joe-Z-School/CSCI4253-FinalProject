@@ -65,8 +65,7 @@
                     </li>
 
                     <li class="nav-item">
-                        <a
-                            href="{{ url_for('assessment.assessment_index') }}"
+                        <a href="{{ url_for('assessment.assessment_index') }}"
                             class="nav-link neon-nav-link {% if request.blueprint == 'assessment' %}active{% endif %}"
                         >
                             <i class="bi bi-clipboard-data"></i>
@@ -75,14 +74,18 @@
                     </li>
 
                     <li class="nav-item">
-                        <a href="#" class="nav-link neon-nav-link">
+                        <a href="{{ url_for('targets.target_index') }}" 
+                            class="nav-link neon-nav-link {% if request.blueprint == 'targets' %}active{% endif %}"
+                        >
                             <i class="bi bi-hdd-network"></i>
                             Targets
                         </a>
                     </li>
 
                     <li class="nav-item">
-                        <a href="#" class="nav-link neon-nav-link">
+                        <a href="{{ url_for('agents.agent_index') }}" 
+                            class="nav-link neon-nav-link {% if request.blueprint == 'agents' %}active{% endif %}"
+                        >
                             <i class="bi bi-pc-display"></i>
                             Agents
                         </a>
