@@ -26,7 +26,7 @@
 
     <!-- Top Navigation -->
     <nav class="navbar neon-topbar px-4">
-        <a class="navbar-brand neon-brand fw-semibold" href="{{ url_for('dashboard.index') }}">
+        <a class="navbar-brand neon-brand fw-semibold" href="{{ url_for('dashboard.dashboard_index') }}">
             <i class="bi bi-shield-lock me-2"></i>
             NETWORK<span>_</span>MONITOR
         </a>
@@ -38,7 +38,8 @@
             </div>
 
             <span class="topbar-label d-none d-sm-inline">
-                MANAGEMENT CONSOLE
+                <i class="bi bi-person-circle me-1"></i>
+                USER
             </span>
         </div>
     </nav>
@@ -55,8 +56,8 @@
 
                     <li class="nav-item">
                         <a
-                            href="{{ url_for('dashboard.index') }}"
-                            class="nav-link neon-nav-link {% if request.endpoint == 'dashboard.index' %}active{% endif %}"
+                            href="{{ url_for('dashboard.dashboard_index') }}"
+                            class="nav-link neon-nav-link {% if request.endpoint == 'dashboard.dashboard_index' %}active{% endif %}"
                         >
                             <i class="bi bi-grid-1x2"></i>
                             Dashboard
