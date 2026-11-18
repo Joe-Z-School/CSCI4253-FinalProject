@@ -139,3 +139,9 @@ def update_assessment(assessment_id):
     data = request.get_json()
     assessment = assessment_service.update_assessment(assessment_id, data)
     return jsonify(assessment)
+
+@assessment_bp.route('/api/agents', methods=['GET'])
+def get_agents():
+    agents = assessment_service.get_all_agents()
+
+    return jsonify(agents)

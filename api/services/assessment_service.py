@@ -9,7 +9,11 @@ import json
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logging.getLogger('psycopg').setLevel(logging.INFO)
 
-redisClient = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
+redisClient = redis.Redis(
+    host=os.getenv("REDIS_HOST", "localhost"), 
+    port=int(os.getenv("REDIS_PORT", 6379)), 
+    db=0, decode_responses=True
+)
 redisListName = 'assessment_queue'
 
 
@@ -109,6 +113,20 @@ def create_assessment_validation(assessment_data):
         raise ValueError("assessment_data must contain 'test_type'")
     if 'tcp_connectivity' in assessment_data['test_type'] and 'ports' not in assessment_data:
         raise ValueError("assessment_data must contain 'ports' for TCP connectivity tests")
+    if 'agent_id' not in assessment_data:
+        raise ValueError("assessment_data must contain 'agent_id'")
+
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute("""
+                SELECT agent_id
+                FROM agents
+                WHERE agent_id = %s
+                AND enabled = TRUE;
+            """, (assessment_data['agent_id'],))
+
+            if not cursor.fetchone():
+                raise ValueError("agent_id must reference a valid enabled agent")
     
     # Make sure target_id references a valid available target
     with get_connection() as conn:
@@ -152,23 +170,52 @@ def create_assessment(assessment_data):
     create_assessment_validation(assessment_data)
 
     newly_created_assessment_id = None
+
     with get_connection() as conn:
         with conn.cursor() as cursor:
-            cursor.execute("""
-                INSERT INTO assessments (target_id)
-                VALUES (%s)
-                RETURNING assessment_id
-            """, (assessment_data['target_id'],))
-            newly_created_assessment_id = cursor.fetchone()['assessment_id']
-            create_assessment_test(cursor, assessment_data, newly_created_assessment_id)
 
-    # Add the new assessment request to the Redis queue
-    job = {"assessment_id": newly_created_assessment_id}
-    
-    redisClient.lpush(redisListName, json.dumps(job))
+            # Retrieve the selected agent's location
+            cursor.execute("""
+                SELECT location
+                FROM agents
+                WHERE agent_id = %s
+                AND enabled = TRUE;
+            """, (assessment_data['agent_id'],))
+
+            agent = cursor.fetchone()
+
+            if not agent or not agent['location']:
+                raise ValueError("Selected agent is unavailable")
+
+            # Create the assessment
+            cursor.execute("""
+                INSERT INTO assessments (target_id, agent_id)
+                VALUES (%s, %s)
+                RETURNING assessment_id;
+            """, (
+                assessment_data['target_id'],
+                assessment_data['agent_id']
+            ))
+
+            newly_created_assessment_id = cursor.fetchone()['assessment_id']
+
+            # Add configured tests and ports
+            create_assessment_test(
+                cursor,
+                assessment_data,
+                newly_created_assessment_id
+            )
+
+    # Route the job to the selected agent's regional queue
+    queue_name = f"assessment_queue:{agent['location']}"
+
+    job = {
+        "assessment_id": newly_created_assessment_id
+    }
+
+    redisClient.lpush(queue_name, json.dumps(job))
 
     return newly_created_assessment_id
-
 
 '''
 Helper function for when a new assessment is created
@@ -319,3 +366,18 @@ def get_assessment_details(assessment_id):
                 'assessment': assessment,
                 'results': results
             }
+
+def get_all_agents():
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute("""
+                SELECT
+                    agent_id,
+                    name,
+                    location
+                FROM agents
+                WHERE enabled = TRUE
+                ORDER BY location;
+            """)
+
+            return cursor.fetchall()
