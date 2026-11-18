@@ -3,7 +3,9 @@
 
 {% block title %}Dashboard | Network Assessment Monitor{% endblock %}
 
+
 {% block page_header %}
+
 <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
 
     <div>
@@ -14,41 +16,45 @@
 
         <h1 class="h3 mb-1">Dashboard</h1>
 
-        <p class="mb-0">
-            Monitor distributed network assessments and worker activity.
+        <p class="mb-0 text-muted">
+            Monitor network assessment activity and distributed worker health.
         </p>
     </div>
 
-    <a href="{{ url_for('assessment.assessment_index') }}"
-       class="btn btn-outline-primary">
-        <i class="bi bi-list-check me-2"></i>
-        View Assessments
-    </a>
+    <div class="d-flex gap-2">
+
+        <a href="{{ url_for('assessment.assessment_index') }}"
+           class="btn btn-outline-primary">
+            <i class="bi bi-list-check me-2"></i>
+            All Assessments
+        </a>
+
+    </div>
 
 </div>
+
 {% endblock %}
 
 
 {% block content %}
 
 <!-- =========================================
-     ASSESSMENT STATISTICS
+     TOP STATISTICS
      ========================================= -->
 
 <div class="row g-3 mb-4">
 
     <!-- Total Assessments -->
-    <div class="col-md-6 col-xl-3">
+    <div class="col-sm-6 col-xl-3">
         <div class="card h-100">
             <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
+
+                <div class="d-flex justify-content-between align-items-start">
 
                     <div>
-                        <p class="stat-label mb-2">
-                            Total Assessments
-                        </p>
+                        <p class="stat-label mb-2">Total Assessments</p>
 
-                        <h2 class="stat-value mb-0">
+                        <h2 class="stat-value mb-1">
                             {{ total_assessments | default(0) }}
                         </h2>
 
@@ -60,90 +66,97 @@
                     <i class="bi bi-clipboard-data fs-1 stat-icon"></i>
 
                 </div>
+
             </div>
         </div>
     </div>
 
 
-    <!-- Completed Assessments -->
-    <div class="col-md-6 col-xl-3">
+    <!-- Success Rate -->
+    <div class="col-sm-6 col-xl-3">
         <div class="card h-100">
             <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
+
+                <div class="d-flex justify-content-between align-items-start">
 
                     <div>
-                        <p class="stat-label mb-2">
-                            Completed
-                        </p>
+                        <p class="stat-label mb-2">Success Rate</p>
 
-                        <h2 class="stat-value mb-0">
-                            {{ completed_assessments | default(0) }}
+                        <h2 class="stat-value mb-1">
+                            {% if success_rate is not none %}
+                                {{ success_rate }}%
+                            {% else %}
+                                N/A
+                            {% endif %}
                         </h2>
 
                         <small class="text-muted">
-                            Successfully completed
+                            Completed vs. failed assessments
                         </small>
                     </div>
 
-                    <i class="bi bi-check-circle fs-1 text-success"></i>
+                    <i class="bi bi-graph-up-arrow fs-1 text-success"></i>
 
                 </div>
+
             </div>
         </div>
     </div>
 
 
-    <!-- Running Assessments -->
-    <div class="col-md-6 col-xl-3">
+    <!-- Active Assessments -->
+    <div class="col-sm-6 col-xl-3">
         <div class="card h-100">
             <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
+
+                <div class="d-flex justify-content-between align-items-start">
 
                     <div>
-                        <p class="stat-label mb-2">
-                            Running
-                        </p>
+                        <p class="stat-label mb-2">Active Assessments</p>
 
-                        <h2 class="stat-value mb-0">
-                            {{ running_assessments | default(0) }}
+                        <h2 class="stat-value mb-1">
+                            {{ (running_assessments | default(0)) +
+                               (pending_assessments | default(0)) }}
                         </h2>
 
                         <small class="text-muted">
-                            Currently processing
+                            {{ running_assessments | default(0) }} running,
+                            {{ pending_assessments | default(0) }} pending
                         </small>
                     </div>
 
                     <i class="bi bi-arrow-repeat fs-1 text-info"></i>
 
                 </div>
+
             </div>
         </div>
     </div>
 
 
     <!-- Failed Assessments -->
-    <div class="col-md-6 col-xl-3">
+    <div class="col-sm-6 col-xl-3">
         <div class="card h-100">
             <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
+
+                <div class="d-flex justify-content-between align-items-start">
 
                     <div>
-                        <p class="stat-label mb-2">
-                            Failed
-                        </p>
+                        <p class="stat-label mb-2">Failed Assessments</p>
 
-                        <h2 class="stat-value mb-0">
+                        <h2 class="stat-value mb-1">
                             {{ failed_assessments | default(0) }}
                         </h2>
 
                         <small class="text-muted">
-                            Require investigation
+                            Assessments requiring investigation
                         </small>
                     </div>
 
                     <i class="bi bi-exclamation-circle fs-1 text-danger"></i>
 
                 </div>
+
             </div>
         </div>
     </div>
@@ -152,23 +165,179 @@
 
 
 <!-- =========================================
-     RECENT ASSESSMENTS
-     ========================================= -->
+    WORKER AGENT OVERVIEW
+========================================= -->
 
 <div class="card mb-4">
 
     <div class="card-header py-3">
+
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+
+            <div>
+                <h5 class="mb-1">
+                    <i class="bi bi-diagram-3 me-2"
+                       style="color: var(--neon-blue);"></i>
+                    Distributed Worker Network
+                </h5>
+
+                <small class="text-muted">
+                    Overview of registered assessment workers
+                </small>
+            </div>
+
+            <div class="d-flex align-items-center gap-3">
+
+                <span class="small text-muted">
+                    {{ enabled_agents | default(0) }} enabled /
+                    {{ total_agents | default(0) }} registered
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="card-body">
+
+        {% if agents %}
+
+            <div class="row g-3">
+
+                {% for agent in agents %}
+
+                    <div class="col-md-6 col-xl-4">
+
+                        <div class="border rounded p-3 h-100">
+
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+
+                                <div class="d-flex align-items-center gap-2">
+
+                                    <div class="rounded d-flex align-items-center justify-content-center"
+                                         style="width: 42px; height: 42px;
+                                                background: rgba(0, 174, 255, 0.10);
+                                                border-color: var(--neon-blue); border-width: 1px;">
+
+                                        <i class="bi bi-pc-display-horizontal fs-4"
+                                           style="color: var(--neon-blue);"></i>
+
+                                    </div>
+
+                                    <div>
+                                        <div class="fw-semibold">
+                                            {{ agent.name }}
+                                        </div>
+
+                                        <small class="text-muted">
+                                            Agent #{{ agent.agent_id }}
+                                        </small>
+                                    </div>
+
+                                </div>
+
+
+                                {% if agent.enabled %}
+
+                                    <span class="badge rounded-pill status-enabled">
+                                        Enabled
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="badge rounded-pill status-disabled">
+                                        Disabled
+                                    </span>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+
+                                <span class="small text-muted">
+                                    <i class="bi bi-geo-alt me-1"></i>
+                                    Location
+                                </span>
+
+                                <span class="small fw-semibold">
+                                    {{ agent.location | default('Unknown') }}
+                                </span>
+
+                            </div>
+
+
+                            <div class="d-flex justify-content-between align-items-center">
+
+                                <span class="small text-muted">
+                                    <i class="bi bi-clock me-1"></i>
+                                    Last Seen
+                                </span>
+
+                                <span class="small">
+
+                                    {% if agent.last_seen_at %}
+                                        {{ agent.last_seen_at.strftime('%b %d, %Y %I:%M %p') }}
+                                    {% else %}
+                                        <span class="text-muted">Never reported</span>
+                                    {% endif %}
+
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="text-center py-4">
+
+                <i class="bi bi-pc-display-horizontal fs-1"
+                   style="color: var(--neon-blue);"></i>
+
+                <h6 class="mt-3">No Worker Agents Registered</h6>
+
+                <p class="text-muted mb-0">
+                    Register a worker agent to begin distributing assessments.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<!-- =========================================
+    RECENT ASSESSMENTS
+========================================= -->
+
+<div class="card mb-4">
+
+    <div class="card-header py-3">
+
         <div class="d-flex justify-content-between align-items-center">
 
             <div>
                 <h5 class="mb-1">
                     <i class="bi bi-activity me-2"
                        style="color: var(--neon-blue);"></i>
-                    Recent Assessments
+                    Recent Activity
                 </h5>
 
                 <small class="text-muted">
-                    Latest network assessment activity
+                    The five most recently submitted assessments
                 </small>
             </div>
 
@@ -179,6 +348,7 @@
             </a>
 
         </div>
+
     </div>
 
 
@@ -192,137 +362,144 @@
                     <tr>
                         <th class="ps-3">Assessment</th>
                         <th>Target</th>
-                        <th>Worker Agent</th>
+                        <th>Tests</th>
+                        <th>Worker</th>
                         <th>Status</th>
-                        <th>Created</th>
+                        <th>Submitted</th>
                     </tr>
                 </thead>
 
 
                 <tbody>
 
-                    {% for assessment in recent_assessments | default([]) %}
+                    {% for assessment in recent_assessments %}
 
-                    <tr>
+                        <tr>
 
-                        <!-- Assessment ID -->
-                        <td class="ps-3">
-                            <span class="fw-semibold"
-                                  style="color: var(--neon-blue);">
-                                #{{ assessment.assessment_id }}
-                            </span>
-                        </td>
-
-
-                        <!-- Target -->
-                        <td>
-                            <div class="fw-semibold">
-                                {{ assessment.target_name | default('Unknown') }}
-                            </div>
-                        </td>
-
-
-                        <!-- Worker Agent -->
-                        <td>
-                            {% if assessment.agent_name %}
-
-                                <i class="bi bi-pc-display-horizontal me-1"
-                                   style="color: var(--neon-blue);"></i>
-
-                                {{ assessment.agent_name }}
-
-                            {% else %}
-
-                                <span class="text-muted">
-                                    Unassigned
+                            <!-- Assessment ID -->
+                            <td class="ps-3">
+                                <span class="fw-semibold"
+                                      style="color: var(--neon-blue);">
+                                    #{{ assessment.assessment_id }}
                                 </span>
-
-                            {% endif %}
-                        </td>
+                            </td>
 
 
-                        <!-- Status -->
-                        <td>
-
-                            {% if assessment.status == 'completed' %}
-
-                                <span class="badge rounded-pill bg-success">
-                                    <i class="bi bi-check-circle me-1"></i>
-                                    Completed
-                                </span>
-
-                            {% elif assessment.status == 'running' %}
-
-                                <span class="badge rounded-pill bg-info">
-                                    <i class="bi bi-arrow-repeat me-1"></i>
-                                    Running
-                                </span>
-
-                            {% elif assessment.status == 'failed' %}
-
-                                <span class="badge rounded-pill bg-danger">
-                                    <i class="bi bi-x-circle me-1"></i>
-                                    Failed
-                                </span>
-
-                            {% else %}
-
-                                <span class="badge rounded-pill bg-warning">
-                                    <i class="bi bi-clock me-1"></i>
-                                    Pending
-                                </span>
-
-                            {% endif %}
-
-                        </td>
-
-
-                        <!-- Created -->
-                        <td>
-                            {% if assessment.created_at %}
-
-                                <span class="text-nowrap">
-                                    {{ assessment.created_at.strftime('%b %d, %Y') }}
-                                </span>
-
-                                <br>
+                            <!-- Target -->
+                            <td>
+                                <div class="fw-semibold">
+                                    {{ assessment.target_name | default('Unknown') }}
+                                </div>
 
                                 <small class="text-muted">
-                                    {{ assessment.created_at.strftime('%I:%M %p') }}
+                                    {{ assessment.target_ip | default('') }}
                                 </small>
+                            </td>
 
-                            {% else %}
 
-                                <span class="text-muted">N/A</span>
+                            <!-- Tests -->
+                            <td>
+                                {% for test in assessment.test_types %}
+                                    <span class="badge rounded-pill bg-secondary me-1 mb-1">
+                                        {{ test | replace('_', ' ') | title }}
+                                    </span>
+                                {% endfor %}
+                            </td>
 
-                            {% endif %}
-                        </td>
 
-                    </tr>
+                            <!-- Worker -->
+                            <td>
+                                {% if assessment.agent_name %}
+                                    <i class="bi bi-pc-display-horizontal me-1"
+                                       style="color: var(--neon-blue);"></i>
+
+                                    {{ assessment.agent_name }}
+                                {% else %}
+                                    <span class="text-muted">Unassigned</span>
+                                {% endif %}
+                            </td>
+
+
+                            <!-- Status -->
+                            <td>
+
+                                {% if assessment.status == 'completed' %}
+
+                                    <span class="badge rounded-pill bg-success">
+                                        <i class="bi bi-check-circle me-1"></i>
+                                        Completed
+                                    </span>
+
+                                {% elif assessment.status == 'running' %}
+
+                                    <span class="badge rounded-pill bg-info">
+                                        <i class="bi bi-arrow-repeat me-1"></i>
+                                        Running
+                                    </span>
+
+                                {% elif assessment.status == 'failed' %}
+
+                                    <span class="badge rounded-pill bg-danger">
+                                        <i class="bi bi-x-circle me-1"></i>
+                                        Failed
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="badge rounded-pill bg-warning text-dark">
+                                        <i class="bi bi-clock me-1"></i>
+                                        Pending
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- Created -->
+                            <td>
+                                {% if assessment.created_at %}
+
+                                    <span class="text-nowrap">
+                                        {{ assessment.created_at.strftime('%b %d, %Y') }}
+                                    </span>
+
+                                    <br>
+
+                                    <small class="text-muted">
+                                        {{ assessment.created_at.strftime('%I:%M %p') }}
+                                    </small>
+
+                                {% else %}
+
+                                    <span class="text-muted">N/A</span>
+
+                                {% endif %}
+                            </td>
+
+                        </tr>
 
                     {% else %}
 
-                    <tr>
-                        <td colspan="5" class="text-center py-5">
+                        <tr>
+                            <td colspan="6" class="text-center py-5">
 
-                            <i class="bi bi-clipboard-x fs-1"
-                               style="color: var(--neon-blue);"></i>
+                                <i class="bi bi-clipboard-x fs-1"
+                                   style="color: var(--neon-blue);"></i>
 
-                            <h5 class="mt-3">
-                                No Assessments Found
-                            </h5>
+                                <h6 class="mt-3">No Recent Assessments</h6>
 
-                            <p class="text-muted mb-3">
-                                No network assessments have been submitted yet.
-                            </p>
+                                <p class="text-muted mb-3">
+                                    Submit your first network assessment to see activity here.
+                                </p>
 
-                            <a href="{{ url_for('assessment.assessment_index') }}"
-                               class="btn btn-outline-primary">
-                                View Assessments
-                            </a>
+                                <a href="{{ url_for('assessment.assessment_index') }}"
+                                   class="btn btn-outline-primary">
+                                    View Assessments
+                                </a>
 
-                        </td>
-                    </tr>
+                            </td>
+                        </tr>
 
                     {% endfor %}
 
@@ -338,23 +515,15 @@
 
 
 <!-- =========================================
-     SYSTEM OVERVIEW
-     ========================================= -->
+    REGISTERED RESOURCES
+========================================= -->
 
 <div class="row g-3">
 
-    <!-- Registered Targets -->
-    <div class="col-lg-6">
+    <!-- Targets -->
+    <div class="col-md-6">
 
         <div class="card h-100">
-
-            <div class="card-header py-3">
-                <h5 class="mb-0">
-                    <i class="bi bi-hdd-network me-2"
-                       style="color: var(--neon-blue);"></i>
-                    Registered Targets
-                </h5>
-            </div>
 
             <div class="card-body">
 
@@ -362,7 +531,7 @@
 
                     <div>
                         <p class="stat-label mb-2">
-                            Network Targets
+                            Registered Targets
                         </p>
 
                         <h2 class="stat-value mb-1">
@@ -370,7 +539,7 @@
                         </h2>
 
                         <small class="text-muted">
-                            Approved assessment targets
+                            Available network assessment destinations
                         </small>
                     </div>
 
@@ -385,18 +554,10 @@
     </div>
 
 
-    <!-- Worker Agents -->
-    <div class="col-lg-6">
+    <!-- Agents -->
+    <div class="col-md-6">
 
         <div class="card h-100">
-
-            <div class="card-header py-3">
-                <h5 class="mb-0">
-                    <i class="bi bi-pc-display-horizontal me-2"
-                       style="color: var(--neon-blue);"></i>
-                    Worker Agents
-                </h5>
-            </div>
 
             <div class="card-body">
 
@@ -404,7 +565,7 @@
 
                     <div>
                         <p class="stat-label mb-2">
-                            Registered Agents
+                            Registered Workers
                         </p>
 
                         <h2 class="stat-value mb-1">
@@ -412,11 +573,11 @@
                         </h2>
 
                         <small class="text-muted">
-                            Distributed assessment workers
+                            {{ enabled_agents | default(0) }} currently enabled
                         </small>
                     </div>
 
-                    <i class="bi bi-pc-display-horizontal fs-1 stat-icon"></i>
+                    <i class="bi bi-diagram-3 fs-1 stat-icon"></i>
 
                 </div>
 
