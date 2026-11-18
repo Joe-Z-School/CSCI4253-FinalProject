@@ -214,9 +214,9 @@ Assessment #{{ assessment.assessment_id }} | Network Assessment Monitor
 
                         <div class="mt-1">
 
-                            {% if assessment.agent_last_seen %}
+                            {% if assessment.last_seen_at %}
 
-                                {{ assessment.agent_last_seen.strftime('%b %d, %Y %I:%M:%S %p') }}
+                                {{ assessment.last_seen_at.strftime('%b %d, %Y %I:%M:%S %p') }}
 
                             {% else %}
 

@@ -519,6 +519,7 @@
 
             <form id="newAssessmentForm"
                   data-targets-url="{{ url_for('targets.get_targets') }}"
+                  data-agents-url="{{ url_for('assessment.get_agents') }}"
                   data-create-url="{{ url_for('assessment.create_assessment') }}">
 
                 <div class="modal-body">
@@ -554,6 +555,29 @@
 
                     </div>
 
+                    <!-- Worker Agent Selection -->
+                    <div class="mb-4">
+                    
+                        <label for="agentSelect" class="form-label">
+                            <i class="bi bi-pc-display-horizontal me-1"
+                                style="color: var(--neon-blue);"></i>
+                            Worker Location
+                        </label>
+                    
+                        <select class="form-select"
+                                id="agentSelect"
+                                name="agent_id"
+                                required>
+                    
+                            <option value="">Loading workers...</option>
+                    
+                        </select>
+                    
+                        <div class="form-text">
+                            Select the geographic worker that will perform this assessment.
+                        </div>
+                    
+                    </div>
 
                     <hr>
 
