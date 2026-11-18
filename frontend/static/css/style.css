@@ -726,3 +726,25 @@ hr {
     border: 1px solid rgba(255, 209, 102, 0.5);
     box-shadow: 0 0 8px rgba(255, 200, 87, 0.2);
 }
+
+/* enabled - Neon Green */
+.status-enabled {
+    color: #00ffae !important;
+    background: rgba(0, 230, 160, 0.12) !important;
+    border: 1px solid rgba(0, 255, 174, 0.55);
+    box-shadow:
+        0 0 8px rgba(0, 255, 174, 0.25),
+        0 0 16px rgba(0, 255, 174, 0.10);
+}
+
+/* Disabled - Neon Red */
+.status-disabled {
+    color: #ff647c !important;
+    background: rgba(255, 85, 114, 0.12) !important;
+    border: 1px solid rgba(255, 100, 124, 0.5);
+    box-shadow: 0 0 8px rgba(255, 85, 114, 0.2);
+}
+
+.card-body .border{
+    border-color: var(--neon-border) !important;
+}
