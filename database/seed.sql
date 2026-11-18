@@ -14,6 +14,6 @@ VALUES
 
 INSERT INTO agents (name, location)
 VALUES
-    ('Oregon Worker', 'Oregon'),
-    ('Virginia Worker', 'Virginia'),
-    ('Colorado Worker', 'Colorado');
+    ('Worker US West', 'us-west1'),
+    ('Worker Europe West', 'europe-west1'),
+    ('Worker Asia Northeast', 'asia-northeast1');
