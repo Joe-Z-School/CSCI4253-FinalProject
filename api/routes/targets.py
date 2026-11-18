@@ -6,6 +6,10 @@ from services import targets_service
 
 targets_bp = Blueprint('targets', __name__)
 
+@targets_bp.route('/', methods=['GET'])
+def target_index():
+    targets = targets_service.get_all_targets()
+    return render_template('targets.html', targets=targets)
 
 @targets_bp.route('/targets', methods=['GET'])
 def get_targets():

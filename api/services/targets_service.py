@@ -29,12 +29,12 @@ def get_all_targets(enabled_only=True):
             target_id,
             name,
             ip_address::text AS ip_address,
-            location
+            location,
+            description,
+            enabled,
+            created_at
         FROM targets
     """
-
-    if enabled_only:
-        query += " WHERE enabled = TRUE"
 
     query += " ORDER BY name;"
 
