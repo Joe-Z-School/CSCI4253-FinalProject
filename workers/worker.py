@@ -5,19 +5,44 @@ from psycopg.rows import dict_row
 import redis
 import json
 from dotenv import load_dotenv
+
 from assessments.tcp_connectivity import run_tcp_connectivity
 from assessments.latency import run_latency
-from assessments.throughput import run_throughput
 from assessments.packetloss import run_packetloss
 
-
-redisClient = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+# Load environment variables first
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '.'))
 load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+
+# Worker configuration
+WORKER_LOCATION = os.getenv("WORKER_LOCATION")
+WORKER_AGENT_ID = os.getenv("WORKER_AGENT_ID")
+
+if not WORKER_LOCATION:
+    raise ValueError("WORKER_LOCATION must be configured")
+
+if not WORKER_AGENT_ID:
+    raise ValueError("WORKER_AGENT_ID must be configured")
+
+WORKER_AGENT_ID = int(WORKER_AGENT_ID)
+
+# Regional Redis queue
+redisListName = f"assessment_queue:{WORKER_LOCATION}"
+
+redisClient = redis.Redis(
+    host=os.getenv("REDIS_HOST", "localhost"),
+    port=int(os.getenv("REDIS_PORT", 6379)),
+    db=0,
+    decode_responses=True
+)
+
+logging.info(
+    f"Worker {WORKER_AGENT_ID} listening on {redisListName}"
 )
 
 def get_connection():
@@ -30,6 +55,18 @@ def get_connection():
         # Get the connection as a dictionary for ease of use
         row_factory=dict_row
     )
+
+def update_assessment_failed(assessment_id, error_message):
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            cursor.execute("""
+                UPDATE assessments
+                SET status = 'failed',
+                    completed_at = CURRENT_TIMESTAMP,
+                    error_message = %s
+                WHERE assessment_id = %s
+                AND status = 'running';
+            """, (error_message, assessment_id))
 
 def update_assessment_status(assessment_id):
 
@@ -91,7 +128,7 @@ def store_results(assessment_id, results):
     update_assessment_status(assessment_id)
 
 while True:
-    queuename, assessment_request = redisClient.brpop('assessment_queue', timeout=0)
+    queuename, assessment_request = redisClient.brpop(redisListName, timeout=0)
 
     if assessment_request is None:
         continue
@@ -109,9 +146,10 @@ while True:
                     SET status = 'running',
                     started_at = CURRENT_TIMESTAMP
                     WHERE assessment_id = %s
+                    AND agent_id = %s
                     AND status = 'pending'
                     RETURNING assessment_id;
-                    """, (assessment_id,))
+                    """, (assessment_id, WORKER_AGENT_ID))
                 conn.commit()
 
                 claimed_assessment = cursor.fetchone()
@@ -152,28 +190,32 @@ while True:
                 assessment = cursor.fetchone()
                 logging.info(f"Fetched assessment: {assessment}")
 
-                results = {}
+                try:
+                    results = {}
 
-                if 'tcp_connectivity' in assessment['test_types']:
-                    tcp_results = run_tcp_connectivity(assessment['target_ip'], assessment['ports'])
-                    results['tcp_connectivity'] = tcp_results
-                    logging.info(f"Ran TCP connectivity test for assessment {assessment['assessment_id']}")
+                    if 'tcp_connectivity' in assessment['test_types']:
+                        tcp_results = run_tcp_connectivity(assessment['target_ip'], assessment['ports'])
+                        results['tcp_connectivity'] = tcp_results
+                        logging.info(f"Ran TCP connectivity test for assessment {assessment['assessment_id']}")
 
-                if 'latency' in assessment['test_types']:
-                    latency_results = run_latency(assessment['target_ip'])
-                    results['latency'] = latency_results
-                    logging.info(f"Ran latency test for assessment {assessment['assessment_id']}")
+                    if 'latency' in assessment['test_types']:
+                        latency_results = run_latency(assessment['target_ip'])
+                        results['latency'] = latency_results
+                        logging.info(f"Ran latency test for assessment {assessment['assessment_id']}")
 
-                if 'throughput' in assessment['test_types']:
-                    throughput_results = run_throughput(assessment['target_ip'])
-                    results['throughput'] = throughput_results
-                    logging.info(f"Ran throughput test for assessment {assessment['assessment_id']}")
-                    
-                if 'packet_loss' in assessment['test_types']:
-                    packetloss_results = run_packetloss(assessment['target_ip'])
-                    results['packet_loss'] = packetloss_results
-                    logging.info(f"Ran packet loss test for assessment {assessment['assessment_id']}")
+                    #if 'throughput' in assessment['test_types']:
+                    #    throughput_results = run_throughput(assessment['target_ip'])
+                    #    results['throughput'] = throughput_results
+                    #    logging.info(f"Ran throughput test for assessment {assessment['assessment_id']}")
 
-                # Store the combined results
-                logging.info(f"Combined results for assessment {assessment['assessment_id']}: {results}")
-                store_results(assessment['assessment_id'], results)
+                    if 'packet_loss' in assessment['test_types']:
+                        packetloss_results = run_packetloss(assessment['target_ip'])
+                        results['packet_loss'] = packetloss_results
+                        logging.info(f"Ran packet loss test for assessment {assessment['assessment_id']}")
+
+                    # Store the combined results
+                    logging.info(f"Combined results for assessment {assessment['assessment_id']}: {results}")
+                    store_results(assessment['assessment_id'], results)
+                except Exception as e:
+                    logging.error(f"Error processing assessment {assessment['assessment_id']}: {e}")
+                    update_assessment_failed(assessment['assessment_id'], str(e))
